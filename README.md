@@ -1,4 +1,4 @@
-# @jt4d/nest-modules
+# @jt4d/nest-toolkit
 
 Монорепозиторий переиспользуемых модулей NestJS. Публикуемые пакеты живут в `packages/*`,
 демонстрационное приложение — в `apps/playground`.

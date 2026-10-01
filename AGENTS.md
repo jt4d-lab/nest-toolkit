@@ -13,4 +13,4 @@
 
 Workflow меняет манифесты только в своём временном checkout и не создаёт коммитов. Перед первой
 публикацией каждого нового публичного пакета настройте в npm его GitHub Actions Trusted Publisher:
-репозиторий `jt4d-lab/nest-modules` и workflow filename `release.yml`.
+репозиторий `jt4d-lab/nest-toolkit` и workflow filename `release.yml`.
