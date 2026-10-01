@@ -1,0 +1,52 @@
+name: CI
+
+on:
+    push:
+        branches:
+            - master
+    pull_request:
+        types:
+            - opened
+            - reopened
+            - synchronize
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+    cancel-in-progress: true
+
+permissions:
+    contents: read
+
+jobs:
+    ci:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version-file: .nvmrc
+                  cache: yarn
+
+            - name: Restore Nx cache
+              uses: actions/cache@v4
+              with:
+                  path: .nx/cache
+                  key: nx-${{ runner.os }}-${{ github.sha }}
+                  restore-keys: |
+                      nx-${{ runner.os }}-
+
+            - name: Install dependencies
+              run: yarn install --frozen-lockfile
+
+            - name: Check workspace sync
+              run: yarn nx sync --check
+
+            - name: Build
+              run: yarn build
+
+            - name: Lint
+              run: yarn lint:check
+
+            - name: Test
+              run: yarn test
