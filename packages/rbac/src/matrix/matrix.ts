@@ -1,4 +1,5 @@
-import { EntityWithPermission, PermissionFromEntity } from '@src/common/rbac';
+import { EmptyObject } from '../empty-object';
+import { EntityWithPermission, PermissionFromEntity } from '../permissions';
 
 import { buildGraph } from './build-graph';
 import { Roles } from './items';
@@ -17,7 +18,7 @@ import {
 
 export function createPermissionMatrix<
     Entity extends EntityWithPermission,
-    Related extends RelatedEntities = {},
+    Related extends RelatedEntities = EmptyObject,
 >(
     name: string,
     permissionsCreator: PermissionDefinitionTableCreator<Entity, Related>,

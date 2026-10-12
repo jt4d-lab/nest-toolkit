@@ -1,8 +1,7 @@
 import { Injectable, Type } from '@nestjs/common';
 
-import { EntityWithPermission } from '@src/common/rbac';
-
 import { PermissionDefinitionTableCreator } from '../matrix';
+import { EntityWithPermission } from '../permissions';
 import {
     PermissionsResolver,
     PermissionsResolverMeta,

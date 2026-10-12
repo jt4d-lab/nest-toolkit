@@ -1,4 +1,4 @@
-import { DynamicModule, Module, Type, INestApplicationContext } from '@nestjs/common';
+import { DynamicModule, INestApplicationContext, Module, Type } from '@nestjs/common';
 
 import { RBACPipe } from './decorators/rbac.decorator';
 import { BaseResolver, rbacBaseResolverToken, rbacFeatureMatrices } from './rbac.providers';

@@ -1,4 +1,4 @@
-import { EntityWithPermission } from '@src/common/rbac';
+import { EntityWithPermission } from '../../../permissions';
 
 export interface Org extends EntityWithPermission<'read' | 'writeArticle'> {
     id: number;

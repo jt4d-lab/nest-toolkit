@@ -2,9 +2,6 @@ import { Controller, Get, INestApplication, Injectable, Module } from '@nestjs/c
 import { Test, TestingModule } from '@nestjs/testing';
 import supertest from 'supertest';
 
-import { EntityWithPermission } from '@src/common/rbac';
-import { LocalLoggerModule } from '@src/server/logger';
-
 import {
     createRole,
     PermissionsResolver,
@@ -18,6 +15,8 @@ import {
 import { RBACAgentManager } from '../agent';
 import { getMeta } from '../decorators';
 import { RBACPipe } from '../decorators/rbac.decorator';
+import { EntityWithPermission } from '../permissions';
+import { LocalLoggerModule } from '../test-utils/logger';
 
 import { createRbacMocker } from './createRbacMocker';
 

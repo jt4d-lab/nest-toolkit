@@ -1,4 +1,4 @@
-import { EntityWithPermission, PermissionFromEntity } from '@src/common/rbac';
+import { EntityWithPermission, PermissionFromEntity } from '../permissions';
 
 import {
     createOperatorNode,
@@ -9,7 +9,7 @@ import {
     createRuleNode,
 } from './graph-nodes';
 import { AnyNode, BaseNode, NodeExport, RBACGraph } from './graph.types';
-import { Definition, ItemType, PermissionDefinitionTable } from './types';
+import { Definition, ItemType, PermissionDefinitionTable, ScopeType } from './types';
 
 interface NodeWithId<Entity extends EntityWithPermission> extends BaseNode<Entity> {
     id: number;
@@ -29,12 +29,13 @@ export function buildGraph<Entity extends EntityWithPermission>(
 
     const root = addNode(createRootNode(name));
 
-    root.children = Array.from(Object.keys(permissionDefinitionTable)).map(
-        (perm: keyof typeof permissionDefinitionTable) => addNode(createPermissionNode(perm)),
+    root.children = Array.from(Object.keys(permissionDefinitionTable)).map((perm) =>
+        addNode(createPermissionNode(perm)),
     );
 
     root.children.forEach((permission) => {
-        const rawDefinition = permissionDefinitionTable[permission.name];
+        const rawDefinition =
+            permissionDefinitionTable[permission.name as PermissionFromEntity<Entity>];
         const definition = Array.isArray(rawDefinition) ? rawDefinition : [rawDefinition];
 
         permission.children.push(...definition.map((def) => buildBranch(def)));
@@ -78,7 +79,16 @@ export function buildGraph<Entity extends EntityWithPermission>(
             case ItemType.Role:
                 return addNode(createRoleNode(item.name));
             case ItemType.Rule:
-                return addNode(createRuleNode(item.name, item.checkAccess, item.opts));
+                return addNode(
+                    createRuleNode(
+                        item.name,
+                        item.checkAccess as (
+                            entity: Entity | undefined,
+                            scope: ScopeType,
+                        ) => boolean,
+                        item.opts,
+                    ),
+                );
 
             case ItemType.AndOperator: {
                 const operator = addNode(createOperatorNode('AND'));

@@ -1,6 +1,5 @@
-import { EntityWithPermission, PermissionFromEntity } from '@src/common/rbac';
-
 import { GraphDebug, Role, ScopeType } from '../matrix';
+import { EntityWithPermission, PermissionFromEntity } from '../permissions';
 import { PermissionsCoordinator } from '../resolver';
 import { RelatedResolverIdTypes } from '../types';
 
@@ -105,11 +104,11 @@ export class AgentPermissionHelper<
 
         const totalRoles = [...this.baseRoles, ...roles];
 
-        const relations = {};
+        const relations: Record<string, any> = {};
 
         const debugInfo: Record<string, GraphDebug> = {};
 
-        const refs = entity ? this.matrix.getReferences(entity) : {};
+        const refs = (entity ? this.matrix.getReferences(entity) : {}) as Record<string, any>;
 
         this.relations.forEach((resolver, key) => {
             relations[key] = resolver.getPermissions(refs[key]);
@@ -193,13 +192,14 @@ export class AgentPermissionHelper<
             throw new Error('Not found prepared scope.\n' + 'Did you forgot call prepare?');
         }
 
-        const relations = {};
+        const relations: Record<string, any> = {};
         const debugInfo: Record<string, GraphDebug> = {};
+        const scopeRecord = scope as Record<string, any> | undefined;
 
         [...this.relations.keys()].forEach((key) => {
             const resolver = this.relations.get(key)!;
 
-            relations[key] = resolver.getPermissions(scope ? scope[key] : undefined);
+            relations[key] = resolver.getPermissions(scopeRecord ? scopeRecord[key] : undefined);
             debugInfo[key] = resolver.matrix.getLastDebugInfo();
         });
 

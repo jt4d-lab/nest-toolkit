@@ -1,8 +1,7 @@
 import { uniq } from 'lodash';
 
-import { EntityWithPermission, PermissionFromEntity } from '@src/common/rbac';
-
 import { ScopeType } from '..';
+import { EmptyObject } from '../empty-object';
 import {
     Definition,
     ItemType,
@@ -13,13 +12,14 @@ import {
     Role,
 } from '../matrix';
 import { createPermissionMatrix } from '../matrix/matrix';
+import { EntityWithPermission, PermissionFromEntity } from '../permissions';
 
-import { PermissionsResolverMeta, PermissionsResolverService, IUpdateRoleAgent } from './types';
+import { IUpdateRoleAgent, PermissionsResolverMeta, PermissionsResolverService } from './types';
 
 export class PermissionsCoordinator<
     ID extends number | string = number | string,
     Entity extends EntityWithPermission = EntityWithPermission,
-    Related extends RelatedEntities = {},
+    Related extends RelatedEntities = EmptyObject,
 > {
     // turn to private if possible
     public readonly matrix: PermissionMatrix<Entity, Related>;

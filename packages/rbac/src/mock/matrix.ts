@@ -1,8 +1,7 @@
-import { EntityWithPermission } from '@src/common/rbac';
-
 import { Operators, RBACMatrix } from '..';
 import { getMeta } from '../decorators';
 import { ItemType, RelatedPermissionMap } from '../matrix';
+import { EntityWithPermission } from '../permissions';
 import { PermissionsResolver, PermissionsResolverType } from '../resolver';
 
 export interface MockController<
@@ -65,7 +64,7 @@ function createMockController(matrix: PermissionsResolverType): [MockController,
 
     const ctrl: MockController = {
         resetMock,
-        mock(entity: object | null, newPermissions) {
+        mock(entity: object | null, newPermissions: Record<string, boolean>) {
             permissionList.forEach((permission) => {
                 if (permission in newPermissions) {
                     return;
@@ -112,7 +111,7 @@ function createMockMatrix(
             getId: fakeGetId(meta.getId),
         },
         ({ createRule }) => {
-            const result = {};
+            const result: Record<string, any> = {};
 
             Object.keys(agent).forEach((permission) => {
                 result[permission] = createRule('fake ' + permission, agent[permission], {
@@ -136,9 +135,10 @@ function getMatrixPermissions(permissionsResolver: PermissionsResolverType): str
     const meta = getMeta(permissionsResolver);
 
     const relations: RelatedPermissionMap<any> = {};
+    const metaRelations = meta.relations as Record<string, PermissionsResolverType>;
 
-    Object.keys(meta.relations).forEach((relationKey) => {
-        const relationPermissions = getMatrixPermissions(meta.relations[relationKey]);
+    Object.keys(metaRelations).forEach((relationKey) => {
+        const relationPermissions = getMatrixPermissions(metaRelations[relationKey]);
 
         relations[relationKey] = {};
 

@@ -1,6 +1,7 @@
-import { EntityWithPermission } from '@src/common/rbac';
+import { EmptyObject } from '../empty-object';
+import { EntityWithPermission } from '../permissions';
 
-import { Permission, ItemType, Rule, Role, ScopeType } from './types';
+import { ItemType, Permission, Role, Rule, ScopeType } from './types';
 
 export const Roles = {
     any: createRole('ΔAny'),
@@ -23,7 +24,7 @@ export function createPermission(name: string): Permission {
     };
 }
 
-export function createRule<Entity extends EntityWithPermission = {}>(
+export function createRule<Entity extends EntityWithPermission = EmptyObject>(
     name: string,
     checkAccess: (entity: Entity, scope: ScopeType) => boolean,
     opts: { allowEmpty?: boolean } = {},

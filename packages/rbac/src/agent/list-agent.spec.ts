@@ -1,11 +1,9 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { EntityWithPermission } from '@src/common/rbac';
-import { LocalLoggerModule } from '@src/server/logger';
-import { TestingLogger, TestingLoggerMatcher } from '@src/server/logger/testing';
-
 import { PermissionsResolver, RBACListAgent, RBACMatrix, RbacModule, RbacService, Roles } from '..';
+import { EntityWithPermission } from '../permissions';
+import { LocalLoggerModule, TestingLogger, TestingLoggerMatcher } from '../test-utils/logger';
 
 import { ScopeRel } from './types';
 

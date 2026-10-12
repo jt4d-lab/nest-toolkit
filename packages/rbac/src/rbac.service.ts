@@ -1,22 +1,21 @@
 import { Inject, Injectable, Optional, Type } from '@nestjs/common';
 
-import { EntityWithPermission } from '@src/common/rbac';
-import { Logger } from '@src/server/logger';
-
 import { RBACAgentManager } from './agent/manager';
 import { IAgentManagerService } from './agent/types';
 import { getMeta } from './decorators';
+import { EmptyObject } from './empty-object';
+import { Logger } from './logger';
 import { RelatedEntities, Role, Roles, ScopeType } from './matrix';
-import {
+import { EntityWithPermission } from './permissions';
+import { rbacBaseResolverToken, rbacFeatureMatrices } from './rbac.providers';
+import type {
     BaseResolver,
     GetBaseRoles,
     GetBaseScope,
     GetBaseScopeResult,
-    rbacBaseResolverToken,
-    rbacFeatureMatrices,
 } from './rbac.providers';
-import {
-    PermissionsCoordinator,
+import { PermissionsCoordinator } from './resolver';
+import type {
     PermissionsResolver,
     PermissionsResolverMeta,
     PermissionsResolverType,
@@ -28,13 +27,10 @@ interface IRbacServiceCore {
     getBaseRoles: GetBaseRoles;
 }
 
-interface RawPermissionsResolver<
-    ID extends number | string = number | string,
-    Entity extends EntityWithPermission = EntityWithPermission,
-> {
-    meta: PermissionsResolverMeta<ID, Entity>;
+interface RawPermissionsResolver {
+    meta: PermissionsResolverMeta<any, any>;
     type: Type<PermissionsResolver>;
-    service?: PermissionsResolver<ID, Entity>;
+    service?: PermissionsResolver<any, any>;
 }
 
 interface InstanceResolver {
@@ -88,7 +84,7 @@ export class RbacServiceCore implements IRbacServiceCore {
     getMatrix<
         ID extends number | string = number | string,
         Entity extends EntityWithPermission = EntityWithPermission,
-        Related extends RelatedEntities = {},
+        Related extends RelatedEntities = EmptyObject,
     >(name: string): PermissionsCoordinator<ID, Entity, Related> {
         const item = this.matrices.get(name);
 
@@ -96,7 +92,7 @@ export class RbacServiceCore implements IRbacServiceCore {
             throw new Error(`Matrix "${name}" not found`);
         }
 
-        return item as PermissionsCoordinator<ID, Entity, Related>;
+        return item as unknown as PermissionsCoordinator<ID, Entity, Related>;
     }
 
     public async initMatrices(resolver: InstanceResolver): Promise<void> {
@@ -137,9 +133,10 @@ export class RbacServiceCore implements IRbacServiceCore {
             const service = getRawInstance(item);
 
             const relatedMatrices: Record<string, PermissionsCoordinator> = {};
+            const relations = item.meta.relations as Record<string, PermissionsResolverType>;
 
-            for (const relationKey in item.meta.relations) {
-                const value = item.meta.relations[relationKey];
+            for (const relationKey in relations) {
+                const value = relations[relationKey];
                 const meta = getMeta(value);
 
                 relatedMatrices[relationKey] = this.getMatrix(meta.name);
@@ -165,15 +162,18 @@ export class RbacServiceCore implements IRbacServiceCore {
 export class RbacService implements IAgentManagerService {
     private readonly moduleAllowedMatrices: string[];
 
+    private readonly logger: Logger;
+
     constructor(
-        private readonly logger: Logger,
+        @Optional() logger: Logger,
         private readonly core: RbacServiceCore,
         @Optional() @Inject(rbacBaseResolverToken) baseResolver: BaseResolver,
         @Optional()
         @Inject(rbacFeatureMatrices)
         public readonly availableMatrices: PermissionsResolverType[],
     ) {
-        logger.setContext('RBAC');
+        this.logger = logger ?? new Logger('RBAC');
+        this.logger.setContext('RBAC');
 
         if (baseResolver) {
             if (this.core.baseResolver) {
@@ -254,7 +254,7 @@ function reorderMatrices(map: Map<string, RawPermissionsResolver>): RawPermissio
             return;
         }
 
-        const relatedMatrixTypes = matrix.meta.relations;
+        const relatedMatrixTypes = matrix.meta.relations as Record<string, PermissionsResolverType>;
 
         for (const key in relatedMatrixTypes) {
             const meta = getMeta(relatedMatrixTypes[key]);

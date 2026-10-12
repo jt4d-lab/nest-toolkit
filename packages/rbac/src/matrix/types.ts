@@ -1,4 +1,5 @@
-import { EntityWithPermission, PermissionFromEntity } from '@src/common/rbac';
+import { EmptyObject } from '../empty-object';
+import { EntityWithPermission, PermissionFromEntity } from '../permissions';
 
 import { GraphDebug } from './graph.types';
 import { Operators } from './operators';
@@ -45,7 +46,7 @@ export interface RelatedPermission {
  * Правило: условие или набор условий, определяющих, когда и как разрешение должно быть применено
  */
 export interface Rule<
-    Entity extends EntityWithPermission = {},
+    Entity extends EntityWithPermission = EmptyObject,
     Scope extends ScopeType = ScopeType,
 > {
     readonly type: ItemType.Rule;
@@ -56,11 +57,7 @@ export interface Rule<
 }
 
 export type Definition<Entity extends EntityWithPermission, Scope extends ScopeType = ScopeType> =
-    | AndOperator<Entity>
-    | OrOperator<Entity>
-    | Role
-    | Rule<Entity, Scope>
-    | RelatedPermission;
+    AndOperator<Entity> | OrOperator<Entity> | Role | Rule<Entity, Scope> | RelatedPermission;
 
 /**
  * Скоуп - это мапа данных которая характеризует сущность с точки зрения ролей.
@@ -75,7 +72,7 @@ export interface ScopeType {
  */
 export interface PermissionMatrix<
     Entity extends EntityWithPermission,
-    Related extends RelatedEntities = {},
+    Related extends RelatedEntities = EmptyObject,
 > {
     readonly type: ItemType.Matrix;
     readonly name: string;
@@ -90,7 +87,7 @@ export interface PermissionMatrix<
 }
 
 export interface AndOperator<
-    Entity extends EntityWithPermission = {},
+    Entity extends EntityWithPermission = EmptyObject,
     Scope extends ScopeType = ScopeType,
 > {
     readonly type: ItemType.AndOperator;
@@ -99,7 +96,7 @@ export interface AndOperator<
 }
 
 export interface OrOperator<
-    Entity extends EntityWithPermission = {},
+    Entity extends EntityWithPermission = EmptyObject,
     Scope extends ScopeType = ScopeType,
 > {
     readonly type: ItemType.OrOperator;
@@ -127,7 +124,7 @@ export type CalculatedRelations<Related extends RelatedEntities> = {
 };
 export interface PermissionDefinitionTableCreator<
     Entity extends EntityWithPermission,
-    Related extends RelatedEntities = {},
+    Related extends RelatedEntities = EmptyObject,
 > {
     (
         operators: Operators<Entity>,

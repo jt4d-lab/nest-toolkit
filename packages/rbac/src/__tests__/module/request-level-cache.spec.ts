@@ -1,8 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { LocalLoggerModule } from '@src/server/logger';
-
 import { RbacModule, RbacService } from '../..';
+import { LocalLoggerModule } from '../../test-utils/logger';
 
 import { ArticleRBAC } from './data/article.rbac';
 import { BaseModule } from './data/base.module';

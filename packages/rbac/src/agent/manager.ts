@@ -1,8 +1,7 @@
-import { EntityWithPermission } from '@src/common/rbac';
-import { Logger } from '@src/server/logger';
-
 import { getMeta } from '../decorators';
+import { Logger } from '../logger';
 import { Role, ScopeType } from '../matrix';
+import { EntityWithPermission } from '../permissions';
 import { PermissionsCoordinator, PermissionsResolverType } from '../resolver';
 import { RelatedResolverIdTypes } from '../types';
 
@@ -36,7 +35,7 @@ interface Item<
 }
 
 export class RBACAgentManager {
-    private readonly items = new Map<string, Item>();
+    private readonly items = new Map<string, Item<any, any, any>>();
 
     constructor(
         private readonly service: IAgentManagerService,
@@ -107,17 +106,17 @@ export class RBACAgentManager {
             return item.helper as AgentPermissionHelper<ID, Entity>;
         }
 
-        const relations = new Map<string, AgentPermissionHelper>();
+        const relations = new Map<string, AgentPermissionHelper<any, any>>();
         const related: PermissionsCoordinator[] = [];
 
         Object.entries(coordinator.relatedResolvers).forEach(
-            ([key, relation]: [string, PermissionsCoordinator]) => {
+            ([key, relation]: [string, PermissionsCoordinator<any, any>]) => {
                 relations.set(key, this.getHelper(relation));
                 related.push(relation);
             },
         );
 
-        const helper = new AgentPermissionHelper(
+        const helper = new AgentPermissionHelper<ID, Entity>(
             coordinator,
             relations,
             this.baseScope,
@@ -134,8 +133,10 @@ export class RBACAgentManager {
     /**
      * Получить всех зависимых агентов от указанного coordinator
      */
-    private getDependents(coordinator: PermissionsCoordinator): AgentPermissionHelper[] {
-        const result: AgentPermissionHelper[] = [];
+    private getDependents(
+        coordinator: PermissionsCoordinator<any, any>,
+    ): AgentPermissionHelper<any, any>[] {
+        const result: AgentPermissionHelper<any, any>[] = [];
 
         this.items.forEach(({ related, helper }) => {
             if (related && related.includes(coordinator) && helper) {
@@ -178,14 +179,14 @@ export class RBACAgentManager {
         return item as Item<ID, Entity, Related>;
     }
 
-    private getOrCreateItem(name: string): Item {
+    private getOrCreateItem(name: string): Item<any, any, any> {
         const item = this.items.get(name);
 
         if (item) {
             return item;
         }
 
-        const newItem = {} as Item;
+        const newItem = {} as Item<any, any, any>;
 
         this.items.set(name, newItem);
 

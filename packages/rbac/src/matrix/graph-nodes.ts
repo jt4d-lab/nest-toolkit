@@ -1,4 +1,4 @@
-import { EntityWithPermission } from '@src/common/rbac';
+import { EntityWithPermission } from '../permissions';
 
 import { andOperator, orOperator } from './graph-operators';
 import {

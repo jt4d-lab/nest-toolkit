@@ -22,7 +22,7 @@ export interface RBACAbstractAgent extends AgentMethods {
     invalidate: any;
 }
 
-export function handleErrorDecision(code: number = 403, message?: string): never {
+export function handleErrorDecision(code = 403, message?: string): never {
     switch (code) {
         case 403:
             throw new ForbiddenException(message);

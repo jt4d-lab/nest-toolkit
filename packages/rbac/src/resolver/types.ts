@@ -1,8 +1,8 @@
 import { Required } from 'utility-types';
 
-import { EntityWithPermission } from '@src/common/rbac';
-
+import { EmptyObject } from '../empty-object';
 import { PermissionDefinitionTableCreator, Role, ScopeType } from '../matrix';
+import { EntityWithPermission } from '../permissions';
 import { EntitiesFromRelatedMatrix, RelatedResolverIdTypes, RelatedResolvers } from '../types';
 
 export type Type<T> = new (...args: any[]) => T;
@@ -10,7 +10,7 @@ export type Type<T> = new (...args: any[]) => T;
 export interface PermissionsResolverMeta<
     ID extends number | string,
     Entity extends EntityWithPermission,
-    Related extends RelatedResolvers = {},
+    Related extends RelatedResolvers = EmptyObject,
 > {
     /**
      * Имя матрицы разрешений

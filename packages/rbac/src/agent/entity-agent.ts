@@ -4,8 +4,7 @@ import {
     EntityWithCalculatedPermissions,
     EntityWithPermission,
     PermissionFromEntity,
-} from '@src/common/rbac';
-
+} from '../permissions';
 import { RelatedResolverIdTypes } from '../types';
 
 import { AgentMethods, handleErrorDecision, RBACAbstractAgent } from './abstract-agent';
@@ -91,8 +90,7 @@ export class RBACEntityAgent<
     ID extends number | string = number | string,
     Entity extends EntityWithPermission = EntityWithPermission,
     Related extends RelatedResolverIdTypes = null,
-> implements IRBACEntityAgent<ID, Entity, Related>
-{
+> implements IRBACEntityAgent<ID, Entity, Related> {
     public readonly sync: RBACEntityAgentSync<ID, Entity, Related>;
 
     constructor(
@@ -218,8 +216,7 @@ class RBACEntityAgentSync<
     ID extends number | string = number | string,
     Entity extends EntityWithPermission = EntityWithPermission,
     Related extends RelatedResolverIdTypes = null,
-> implements IRBACEntityAgentSync<ID, Entity, Related>
-{
+> implements IRBACEntityAgentSync<ID, Entity, Related> {
     constructor(
         private readonly helper: AgentPermissionHelper<ID, Entity>,
         public readonly log: EntityAgentLogs<ID, Entity, Related>,

@@ -1,6 +1,5 @@
-import { EntityWithPermission } from '@src/common/rbac';
-
 import { RBACMatrix } from '../..';
+import { EntityWithPermission } from '../../permissions';
 
 describe('RBAC module / types', () => {
     interface IDemoEntity extends EntityWithPermission<'read'> {

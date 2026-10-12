@@ -1,4 +1,4 @@
-import { EntityWithPermission } from '@src/common/rbac';
+import { EntityWithPermission } from '../permissions';
 
 import { BaseNode, EntityContext } from './graph.types';
 

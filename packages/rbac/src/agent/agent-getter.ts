@@ -1,5 +1,4 @@
-import { EntityWithPermission } from '@src/common/rbac';
-
+import { EntityWithPermission } from '../permissions';
 import { PermissionsResolverType } from '../resolver';
 import { RelatedResolverIdTypes } from '../types';
 

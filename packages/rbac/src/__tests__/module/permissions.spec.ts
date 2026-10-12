@@ -2,9 +2,8 @@ import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import supertest from 'supertest';
 
-import { LocalLoggerModule } from '@src/server/logger';
-
 import { RbacModule } from '../..';
+import { LocalLoggerModule } from '../../test-utils/logger';
 
 import { ArticlesModule } from './data/articles.module';
 import { BaseModule, BaseResolverMock } from './data/base.module';

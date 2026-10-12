@@ -1,4 +1,4 @@
-import { EntityWithPermission } from '@src/common/rbac';
+import { EntityWithPermission } from '../permissions';
 
 import { createRule } from './items';
 import { AndOperator, Definition, ItemType, OrOperator, Rule, ScopeType } from './types';

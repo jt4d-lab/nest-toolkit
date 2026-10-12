@@ -1,14 +1,12 @@
 import { Controller, Get, Module, Param, ParseIntPipe } from '@nestjs/common';
 
-import { PaginatedResponse } from '@src/common/pagination';
-import { PermissionFromEntity } from '@src/common/rbac';
-import { makeDummyPaginatedResponse } from '@src/server/common';
-
 import { RBAC, RBACAgent, RbacModule } from '../../..';
+import { PermissionFromEntity } from '../../../permissions';
 
 import { ArticleRBAC } from './article.rbac';
 import { Article } from './entities';
 import { OrgsModule } from './orgs.module';
+import { makeDummyPaginatedResponse, PaginatedResponse } from './pagination';
 
 @Controller()
 class ArticleController {

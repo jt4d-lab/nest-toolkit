@@ -1,10 +1,6 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { EntityWithPermission } from '@src/common/rbac';
-import { LocalLoggerModule } from '@src/server/logger';
-import { TestingLogger, TestingLoggerMatcher } from '@src/server/logger/testing';
-
 import {
     PermissionsResolver,
     RBACEntityAgent,
@@ -13,6 +9,8 @@ import {
     RbacService,
     Roles,
 } from '..';
+import { EntityWithPermission } from '../permissions';
+import { LocalLoggerModule, TestingLogger, TestingLoggerMatcher } from '../test-utils/logger';
 
 interface Article extends EntityWithPermission<'read' | 'edit' | 'delete'> {
     id: number;

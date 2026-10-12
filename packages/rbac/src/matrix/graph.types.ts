@@ -1,10 +1,11 @@
-import { EntityWithPermission, PermissionFromEntity } from '@src/common/rbac';
+import { EmptyObject } from '../empty-object';
+import { EntityWithPermission, PermissionFromEntity } from '../permissions';
 
 import { CalculatedRelations, RelatedEntities, ScopeType } from './types';
 
 export interface RBACGraph<
     Entity extends EntityWithPermission,
-    Related extends RelatedEntities = {},
+    Related extends RelatedEntities = EmptyObject,
 > {
     name: string;
     calculate(context: EntityContext<Related>, entity?: Entity): PermissionFromEntity<Entity>[];
@@ -45,8 +46,9 @@ export interface PermissionNode<Entity extends EntityWithPermission> extends Bas
     type: NodeType.Permission;
 }
 
-export interface RelatedPermissionNode<Entity extends EntityWithPermission>
-    extends BaseNode<Entity> {
+export interface RelatedPermissionNode<
+    Entity extends EntityWithPermission,
+> extends BaseNode<Entity> {
     type: NodeType.RelatedPermission;
     relation: string;
 }

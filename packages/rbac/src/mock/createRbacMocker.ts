@@ -1,12 +1,11 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { NestApplicationContext } from '@nestjs/core';
 
-import { EntityWithPermission, PermissionFromEntity } from '@src/common/rbac';
-
 import { RbacModule, RbacService, ScopeType } from '..';
 import { RBACAgentManager } from '../agent';
 import { getMeta } from '../decorators';
 import { Role } from '../matrix';
+import { EntityWithPermission, PermissionFromEntity } from '../permissions';
 import { GetBaseScopeResult } from '../rbac.providers';
 import { RbacServiceCore } from '../rbac.service';
 import { PermissionsResolverType } from '../resolver';

@@ -1,6 +1,5 @@
-import { EntityWithPermission, PermissionFromEntity } from '@src/common/rbac';
-import { Logger } from '@src/server/logger';
-
+import { Logger } from '../logger';
+import { EntityWithPermission, PermissionFromEntity } from '../permissions';
 import { RelatedResolverIdTypes } from '../types';
 
 import { AgentPermissionHelper } from './agent-permission-helper';
