@@ -60,23 +60,44 @@ jobs:
               run: yarn build
 
             - name: Update npm
-              run: npm install --global npm@^11.5.1
+              run: npm install --global npm@^11.6.0
 
-            - name: Publish packages
+            - name: Stage packages
               env:
                   EVENT_NAME: ${{ github.event_name }}
                   PACKAGE_LIST: ${{ runner.temp }}/packages-to-publish
+                  STAGE_LOG: ${{ runner.temp }}/staged-packages.log
               run: |
+                  set -euo pipefail
+
                   if [[ "$EVENT_NAME" == 'push' ]]; then
                       dist_tag=latest
                   else
                       dist_tag=canary
                   fi
 
+                  : > "$STAGE_LOG"
+
                   while IFS= read -r package_dir; do
-                      npm publish "./$package_dir" \
+                      npm stage publish "./$package_dir" \
                           --access public \
                           --provenance \
                           --registry https://registry.npmjs.org \
-                          --tag "$dist_tag"
+                          --tag "$dist_tag" | tee -a "$STAGE_LOG"
                   done < "$PACKAGE_LIST"
+
+                  {
+                      echo "## Release staged for approval (dist-tag: $dist_tag)"
+                      echo
+                      echo 'Ни один пакет ещё не опубликован: они лежат в staging и недоступны потребителям.'
+                      echo
+                      echo 'Проверить: `npm stage list`, `npm stage view <stage-id>`,'
+                      echo '`npm stage download <stage-id>` (нужен npm@11.6.0+).'
+                      echo
+                      echo 'Опубликовать: `npm stage approve <stage-id>` с 2FA.'
+                      echo 'Отклонить: `npm stage reject <stage-id>` (тоже 2FA).'
+                      echo
+                      echo '```'
+                      grep '^+ ' "$STAGE_LOG" || cat "$STAGE_LOG"
+                      echo '```'
+                  } >> "$GITHUB_STEP_SUMMARY"
