@@ -1,0 +1,49 @@
+{
+    "name": "rbac",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "packages/rbac/src",
+    "projectType": "library",
+    "tags": [
+        "type:lib"
+    ],
+    "targets": {
+        "lint": {
+            "executor": "@nx/eslint:lint",
+            "options": {
+                "lintFilePatterns": [
+                    "{projectRoot}/**/*.ts"
+                ],
+                "eslintConfig": "{projectRoot}/eslint.config.mjs",
+                "fix": true
+            }
+        },
+        "lint-check": {
+            "executor": "@nx/eslint:lint",
+            "options": {
+                "lintFilePatterns": [
+                    "{projectRoot}/**/*.ts"
+                ],
+                "eslintConfig": "{projectRoot}/eslint.config.mjs"
+            }
+        },
+        "format": {
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "prettier --write {projectRoot}"
+            }
+        },
+        "format-check": {
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "prettier --check {projectRoot}"
+            }
+        },
+        "clean": {
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "rimraf dist out-tsc",
+                "cwd": "{projectRoot}"
+            }
+        }
+    }
+}
