@@ -10,10 +10,22 @@
             "@jt4d/source": "./src/index.ts",
             "types": "./dist/index.d.ts",
             "default": "./dist/index.js"
+        },
+        "./mock": {
+            "@jt4d/source": "./src/mock/index.ts",
+            "types": "./dist/mock/index.d.ts",
+            "default": "./dist/mock/index.js"
         }
     },
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
+    "typesVersions": {
+        "*": {
+            "mock": [
+                "./dist/mock/index.d.ts"
+            ]
+        }
+    },
     "files": [
         "dist",
         "!dist/**/*.tsbuildinfo"
