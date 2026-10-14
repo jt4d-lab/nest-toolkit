@@ -15,7 +15,7 @@ Workflow `.github/workflows/release.yml` ничего не публикует н
 
 В обоих случаях пакеты лежат в staging и недоступны потребителям, пока их не подтвердят; workflow
 печатает версии пакетов в summary шага в формате, который можно вставить прямо в зависимости
-`package.json` (например, `"@jt4d/nest-rbac": "1.2.3"`). Stage id берётся из `npm stage list`.
+`package.json` (например, `"@jt4d/nest-rbac": "1.2.3",`). Stage id берётся из `npm stage list`.
 
 ### Подтверждение релиза
 
