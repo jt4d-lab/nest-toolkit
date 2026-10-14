@@ -21,7 +21,6 @@ export default [
                 {
                     enforceBuildableLibDependency: true,
                     allow: ['^.*/eslint(\\.base)?\\.config\\.[cm]?[jt]s$'],
-                    allowCircularSelfDependency: true,
                     depConstraints: [
                         {
                             sourceTag: 'type:app',
@@ -90,19 +89,5 @@ export default [
                 },
             ],
         },
-    },
-    {
-        files: [
-            '**/*.ts',
-            '**/*.tsx',
-            '**/*.cts',
-            '**/*.mts',
-            '**/*.js',
-            '**/*.jsx',
-            '**/*.cjs',
-            '**/*.mjs',
-        ],
-        // Override or add rules here
-        rules: {},
     },
 ];

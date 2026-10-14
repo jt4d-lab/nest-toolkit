@@ -65,7 +65,7 @@
         ],
         "projectsRelationship": "independent",
         "version": {
-            "preVersionCommand": "yarn nx run-many -t build -p packages/*"
+            "preVersionCommand": "yarn nx run-many -t build -p tag:type:lib"
         }
     },
     "tui": {
