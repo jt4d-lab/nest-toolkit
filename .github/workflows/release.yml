@@ -98,6 +98,11 @@ jobs:
                       echo 'Отклонить: `npm stage reject <stage-id>` (тоже 2FA).'
                       echo
                       echo '```'
-                      grep '^+ ' "$STAGE_LOG" || cat "$STAGE_LOG"
+                      staged_lines="$(sed -nE 's/^\+ (.+)@([^@ ]+) \(staged with id [^)]+\)[[:space:]]*$/"\1": "\2"/p' "$STAGE_LOG")"
+                      if [[ -n "$staged_lines" ]]; then
+                          printf '%s\n' "$staged_lines"
+                      else
+                          cat "$STAGE_LOG"
+                      fi
                       echo '```'
                   } >> "$GITHUB_STEP_SUMMARY"

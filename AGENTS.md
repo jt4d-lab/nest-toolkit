@@ -14,7 +14,8 @@ Workflow `.github/workflows/release.yml` ничего не публикует н
   npm dist-tag `canary`.
 
 В обоих случаях пакеты лежат в staging и недоступны потребителям, пока их не подтвердят; workflow
-печатает stage id каждого пакета в summary шага.
+печатает версии пакетов в summary шага в формате, который можно вставить прямо в зависимости
+`package.json` (например, `"@jt4d/nest-rbac": "1.2.3"`). Stage id берётся из `npm stage list`.
 
 ### Подтверждение релиза
 
