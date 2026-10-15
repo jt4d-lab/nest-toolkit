@@ -1,7 +1,7 @@
 import { DynamicModule, INestApplicationContext, Module, Type } from '@nestjs/common';
 
 import { RBACPipe } from './decorators/rbac.decorator';
-import { BaseResolver, rbacBaseResolverToken, rbacFeatureMatrices } from './rbac.providers';
+import { BaseResolver, RBAC_BASE_RESOLVER, RBAC_FEATURE_MATRICES } from './rbac.providers';
 import { RbacService, RbacServiceCore } from './rbac.service';
 import { PermissionsResolver } from './resolver';
 
@@ -30,7 +30,7 @@ export class RbacModule {
         return {
             module: RbacModule,
             imports: [RbacModuleCore],
-            providers: [{ provide: rbacBaseResolverToken, useExisting: baseResolver }, RbacService],
+            providers: [{ provide: RBAC_BASE_RESOLVER, useExisting: baseResolver }, RbacService],
         };
     }
 
@@ -41,7 +41,7 @@ export class RbacModule {
             providers: [
                 RbacService,
                 RBACPipe,
-                { provide: rbacFeatureMatrices, useValue: matrices },
+                { provide: RBAC_FEATURE_MATRICES, useValue: matrices },
             ],
             exports: [RbacService, RBACPipe],
         };
@@ -61,8 +61,8 @@ export class RbacModule {
             module: RbacModule,
             imports: [RbacModuleCore],
             providers: [
-                { provide: rbacBaseResolverToken, useValue: baseResolver },
-                { provide: rbacFeatureMatrices, useValue: matrices },
+                { provide: RBAC_BASE_RESOLVER, useValue: baseResolver },
+                { provide: RBAC_FEATURE_MATRICES, useValue: matrices },
                 RbacService,
             ],
         };

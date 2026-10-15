@@ -1,7 +1,7 @@
 import { Role, ScopeType } from './matrix';
 
-export const rbacBaseResolverToken = 'RBAC_BASE_RESOLVER';
-export const rbacFeatureMatrices = 'RBAC_FEATURE_MATRICES';
+export const RBAC_BASE_RESOLVER = 'RBAC_BASE_RESOLVER';
+export const RBAC_FEATURE_MATRICES = 'RBAC_FEATURE_MATRICES';
 
 export interface GetBaseScopeResult {
     loggedIn: boolean;

@@ -4,7 +4,6 @@ export type { ScopeType, Role } from './matrix';
 export { RBAC, RBACMatrix } from './decorators';
 export { RbacService } from './rbac.service';
 export type { PermissionsResolver, PermissionsResolverType, UpdateRolesProps } from './resolver';
-export { rbacBaseResolverToken, rbacFeatureMatrices } from './rbac.providers';
 export type {
     BaseResolver,
     GetBaseScope,

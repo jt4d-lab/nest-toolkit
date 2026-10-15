@@ -7,7 +7,7 @@ import { EmptyObject } from './empty-object';
 import { Logger } from './logger';
 import { RelatedEntities, Role, ScopeType, SystemRoles } from './matrix';
 import { EntityWithPermission } from './permissions';
-import { rbacBaseResolverToken, rbacFeatureMatrices } from './rbac.providers';
+import { RBAC_BASE_RESOLVER, RBAC_FEATURE_MATRICES } from './rbac.providers';
 import type {
     BaseResolver,
     GetBaseRoles,
@@ -167,9 +167,9 @@ export class RbacService implements IAgentManagerService {
     constructor(
         @Optional() logger: Logger,
         private readonly core: RbacServiceCore,
-        @Optional() @Inject(rbacBaseResolverToken) baseResolver: BaseResolver,
+        @Optional() @Inject(RBAC_BASE_RESOLVER) baseResolver: BaseResolver,
         @Optional()
-        @Inject(rbacFeatureMatrices)
+        @Inject(RBAC_FEATURE_MATRICES)
         public readonly availableMatrices: PermissionsResolverType[],
     ) {
         this.logger = logger ?? new Logger('RBAC');
