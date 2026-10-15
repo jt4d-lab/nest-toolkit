@@ -357,9 +357,11 @@ export class DefaultRBACLogger implements RBACLogger {
 
 ### Task 6: [Final] Документация и архивация плана
 
-- [ ] README у пакета отсутствует — при необходимости добавить короткий раздел про логирование
-      (решение по факту: если README не заводили, пункт закрывается пометкой)
-- [ ] перенести план в `docs/plans/completed/20261015-rbac-logging.md`
+- [x] README у пакета отсутствует — при необходимости добавить короткий раздел про логирование
+      (решение по факту: если README не заводили, пункт закрывается пометкой). Решение: README не
+      заводили (в `packages/rbac/` его нет и раньше не было), пункт закрыт пометкой
+- [x] перенести план в `docs/plans/completed/20261015-rbac-logging.md` (archiving handled by the
+      harness after all phases finish — файл плана не перемещался вручную)
 
 ## Post-Completion
 
