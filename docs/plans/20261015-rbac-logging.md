@@ -230,25 +230,25 @@ export class DefaultRBACLogger implements RBACLogger {
 - Create: `packages/rbac/src/logging/index.ts`
 - Create: `packages/rbac/src/logging/default-logger.spec.ts`
 
-- [ ] описать в `logging/events.ts` 7 типов событий, `RBACEvent`, `RBACEventType`, `RBACLogLevel`
+- [x] описать в `logging/events.ts` 7 типов событий, `RBACEvent`, `RBACEventType`, `RBACLogLevel`
       (по Technical Details)
-- [ ] описать в `logging/logger.ts` `RBACLogger` (7 методов), `RBACLoggerOptions`, `RBACLogSink`,
+- [x] описать в `logging/logger.ts` `RBACLogger` (7 методов), `RBACLoggerOptions`, `RBACLogSink`,
       `DEFAULT_LOG_LEVELS`, тексты сообщений
-- [ ] реализовать `DefaultRBACLogger`: конструктор `(options, sink = new NestLogger('RBAC'))`, 7
+- [x] реализовать `DefaultRBACLogger`: конструктор `(options, sink = new NestLogger('RBAC'))`, 7
       методов → `emit`; `false` в levels — early return; prefix; normalization details (scope →
       `serializeScope`, undefined → `'null'`; granted → `join(', ') || '(none)'`; required →
       `join(', ')`); `serializeScope`
-- [ ] barrel `logging/index.ts` (экспорт событий, `RBACLogger`, опций, `DefaultRBACLogger`)
-- [ ] написать тесты `DefaultRBACLogger` (fake-синк): дефолтный уровень и текст сообщения для
+- [x] barrel `logging/index.ts` (экспорт событий, `RBACLogger`, опций, `DefaultRBACLogger`)
+- [x] написать тесты `DefaultRBACLogger` (fake-синк): дефолтный уровень и текст сообщения для
       каждого из 7 событий
-- [ ] написать тесты: переопределение уровня через `levels`, отключение события `false`, prefix в
+- [x] написать тесты: переопределение уровня через `levels`, отключение события `false`, prefix в
       сообщении
-- [ ] написать тесты normalization details: scope-объект → строка, `scope` undefined → `'null'`,
+- [x] написать тесты normalization details: scope-объект → строка, `scope` undefined → `'null'`,
       `grantedPermissions` пустой массив → `'(none)'`, `requiredPermissions` → `join(', ')` (без
       `'(none)'`-fallback), `error` пробрасывается, отсутствие лишних полей
-- [ ] написать тест дефолтного синка: инстанс Nest Logger с context `RBAC` (spy на прототип
+- [x] написать тест дефолтного синка: инстанс Nest Logger с context `RBAC` (spy на прототип
       `NestLogger`)
-- [ ] выполнить `nx test rbac` — зелёно (доходка: task не трогает ядро, весь суит зелёный)
+- [x] выполнить `nx test rbac` — зелёно (доходка: task не трогает ядро, весь суит зелёный)
 
 ### Task 2: Тест-утилита `TestingRBACLogger`
 
