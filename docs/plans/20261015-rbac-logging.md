@@ -319,17 +319,17 @@ export class DefaultRBACLogger implements RBACLogger {
 
 - Create: `packages/rbac/src/__tests__/module/logging.spec.ts`
 
-- [ ] тест: `forRoot` без `logger` — fallback на `DefaultRBACLogger` (спай на `NestLogger`:
+- [x] тест: `forRoot` без `logger` — fallback на `DefaultRBACLogger` (спай на `NestLogger`:
       матричные события видны в стандартном логгере; в провайдер под токеном события не доходят)
-- [ ] тест: `forRoot({ logger })` — кастомный логгер получает `matrixInitialized` при инициализации
+- [x] тест: `forRoot({ logger })` — кастомный логгер получает `matrixInitialized` при инициализации
       матриц (холодный путь через `RbacServiceCore`)
-- [ ] тест: `RBAC_LOGGER` из **global** тест-модуля (без опции forRoot) — события приходят туда; при
+- [x] тест: `RBAC_LOGGER` из **global** тест-модуля (без опции forRoot) — события приходят туда; при
       наличии и опции forRoot и global-токена побеждает опция forRoot
-- [ ] тест: `RBAC_LOGGER` из **не-global** модуля до `RbacService` **не** доходит (пиннинг семантики
+- [x] тест: `RBAC_LOGGER` из **не-global** модуля до `RbacService` **не** доходит (пиннинг семантики
       скоупов Nest — регресс-тест на обвязку)
-- [ ] тест: горячий путь — события доступа (`accessGranted/accessDenied`) доходят до кастомного
+- [x] тест: горячий путь — события доступа (`accessGranted/accessDenied`) доходят до кастомного
       логгера через `RbacService.createManager`
-- [ ] выполнить `nx test rbac` — зелёно
+- [x] выполнить `nx test rbac` — зелёно
 
 ### Task 5: Проверка acceptance-критериев
 
