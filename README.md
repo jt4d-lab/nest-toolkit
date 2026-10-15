@@ -66,3 +66,7 @@ yarn install
   параметры конструктора с `@Inject`) нужно импортировать через `import type`.
 - Тесты используют `unplugin-swc`: esbuild не умеет `emitDecoratorMetadata`, без которой не работает
   DI NestJS.
+- Провайдеры не-`global` модуля приложения не видны `RbacService` из `RbacModule`: свой логгер для
+  `@jt4d/nest-rbac` нужно передавать через `RbacModule.forRoot({ logger })` либо регистрировать
+  `RBAC_LOGGER` в **`@Global()`**-модуле (так же устроен `RBACTestingLoggerModule.forTesting()`);
+  подробнее — в `packages/rbac/README.md`.

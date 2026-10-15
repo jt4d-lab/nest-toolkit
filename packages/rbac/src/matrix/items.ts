@@ -1,0 +1,32 @@
+import { EmptyObject } from '../empty-object';
+import { EntityWithPermission } from '../permissions';
+
+import { ItemType, Role, Rule, ScopeType } from './types';
+
+export const SystemRoles = {
+    any: createRole('ΔAny'),
+    guest: createRole('ΔGuest'),
+    loggedIn: createRole('ΔLoggedIn'),
+} as const;
+
+export function createRole(name: string, extendRoles: Role[] = []): Role {
+    return {
+        type: ItemType.Role,
+        name,
+        extendRoles,
+    };
+}
+
+export function createRule<Entity extends EntityWithPermission = EmptyObject>(
+    name: string,
+    checkAccess: (entity: Entity, scope: ScopeType) => boolean,
+    opts: { allowEmpty?: boolean } = {},
+): Rule<Entity> {
+    return {
+        type: ItemType.Rule,
+        name,
+        deps: [SystemRoles.any],
+        checkAccess,
+        opts,
+    };
+}
