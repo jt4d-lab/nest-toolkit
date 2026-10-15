@@ -333,12 +333,27 @@ export class DefaultRBACLogger implements RBACLogger {
 
 ### Task 5: Проверка acceptance-критериев
 
-- [ ] проверить, что все требования из Solution Overview реализованы (чек по пунктам 1–5)
-- [ ] проверить публичный API собранного пакета: `nx build rbac` + проверка, что `Logger` удалён, а
-      `RBACLogger`/`DefaultRBACLogger`/`RBAC_LOGGER`/типы событий экспортируются
-- [ ] прогнать полный суит: `yarn test`
-- [ ] прогнать `nx lint-check rbac`, `nx typecheck rbac`, `nx format-check rbac`
-- [ ] зафиксировать ✅ / ⚠️ в этом файле плана
+- [x] ✅ требования Solution Overview 1–5 реализованы: контракт 7 событий и `RBACLogger`
+      (`src/logging/events.ts`, `src/logging/logger.ts`); `DefaultRBACLogger` с `levels`/`prefix` и
+      `false`-отключением событий; токен `RBAC_LOGGER` + `forRoot({ logger })`; прокидка
+      `core.logger` из `RbacService` и fallback на `DefaultRBACLogger`; `TestingRBACLogger` +
+      `RBACTestingLoggerModule.forTesting()` (`global: true`), старые `Logger`/`MockLogger`/
+      `LocalLoggerModule`/`TestingLogger` удалены (grep по `src/` — совпадений нет)
+- [x] ✅ публичный API собранного пакета (`nx build rbac --skip-nx-cache` после `rm -rf dist`):
+      `Logger` отсутствует и в `dist/index.d.ts`, и в runtime-экспортах (`require('./dist')` —
+      `has Logger: false`); `RBACLogger`, `RBACLoggerOptions`, `RBACLogSink`, `RBACEvent`,
+      `RBACEventType`, `RBACLogLevel` и типы всех 7 событий есть в `dist/index.d.ts`;
+      `DefaultRBACLogger` и `RBAC_LOGGER` есть в runtime-экспортах. ⚠️ дефолтный синк — приватный
+      `NestLoggerSink` (обёртка, маппящая `info` → Nest `log`), а не сырой `new NestLogger('RBAC')`:
+      у Nest Logger нет метода `info`, требуемого `RBACLogSink`; контекст `RBAC` сохранён
+- [x] ✅ полный суит `yarn test` (`nx run-many -t test --skip-nx-cache`): 146 passed | 3 skipped, 11
+      файлов (база — 110 passed | 3 skipped)
+- [x] ✅ `nx lint-check rbac` — зелёно, 0 errors (67 warnings — pre-existing
+      `@typescript-eslint/no-explicit-any`/`no-non-null-assertion`, ни одного в новых файлах
+      `src/logging/`, `src/test-utils/`); `nx typecheck rbac` — зелёно; `nx format-check rbac` — All
+      matched files use Prettier code style
+- [x] ✅ результаты зафиксированы здесь: 4 пункта ✅, 1 ⚠️ (обёртка дефолтного синка, см. выше),
+      блокеров нет
 
 ### Task 6: [Final] Документация и архивация плана
 
