@@ -228,6 +228,7 @@ describe('RBAC / EntityAgent', () => {
                     .entityNotFound()
                     .withDetails({
                         matrix: 'article',
+                        entity: undefined,
                         user: 101,
                     })
                     .toBeLoggedTimes(2);
@@ -319,6 +320,7 @@ describe('RBAC / EntityAgent', () => {
                     .entityNotFound()
                     .withDetails({
                         matrix: 'article',
+                        entity: undefined,
                         user: 101,
                     })
                     .toBeLoggedOnce();

@@ -37,7 +37,10 @@ export class EntityAgentLogs<
     private prepareBaseEvent(entity?: ID | Entity) {
         return {
             matrix: this.helper.matrix.name,
-            entity: entity ? this.helper.getEntityId(entity) : undefined,
+            entity:
+                entity === undefined || entity === null
+                    ? undefined
+                    : this.helper.getEntityId(entity),
             user: this.helper.baseScope.profileId || 0,
         };
     }

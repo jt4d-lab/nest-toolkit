@@ -96,30 +96,36 @@ export class RbacServiceCore implements IRbacServiceCore {
         return item as unknown as PermissionsCoordinator<ID, Entity, Related>;
     }
 
+    /**
+     * Единственная точка разрешения логгера: установленный `RbacService` или дефолтный.
+     * Первое обращение запоминает логгер в общем ядре.
+     */
+    get currentLogger(): RBACLogger {
+        return (this.logger ??= new DefaultRBACLogger());
+    }
+
     public async initMatrices(resolver: InstanceResolver): Promise<void> {
-        const logger = this.logger ?? new DefaultRBACLogger();
         let matrices = Array.from(this.rawMatrices.values());
 
         for (const item of matrices) {
-            await this.instantiateMatrix(item, resolver, logger);
+            await this.instantiateMatrix(item, resolver);
         }
 
         matrices = reorderMatrices(this.rawMatrices);
 
-        matrices.forEach((item) => this.initMatrix(item, logger));
+        matrices.forEach((item) => this.initMatrix(item));
     }
 
     private async instantiateMatrix(
         item: RawPermissionsResolver,
         resolver: InstanceResolver,
-        logger: RBACLogger,
     ): Promise<void> {
         const name = item.meta.name;
 
         try {
             item.service = await resolver.resolve(item.type);
         } catch (error) {
-            logger.matrixInstantiateFailed({
+            this.currentLogger.matrixInstantiateFailed({
                 matrix: name,
                 type: item.type.name,
                 error,
@@ -128,7 +134,7 @@ export class RbacServiceCore implements IRbacServiceCore {
         }
     }
 
-    private initMatrix(item: RawPermissionsResolver, logger: RBACLogger): void {
+    private initMatrix(item: RawPermissionsResolver): void {
         const name = item.meta.name;
 
         try {
@@ -149,9 +155,9 @@ export class RbacServiceCore implements IRbacServiceCore {
                 new PermissionsCoordinator(item.meta, service, relatedMatrices),
             );
 
-            logger.matrixInitialized({ matrix: name });
+            this.currentLogger.matrixInitialized({ matrix: name });
         } catch (error) {
-            logger.matrixInitFailed({
+            this.currentLogger.matrixInitFailed({
                 matrix: name,
                 type: item.type.name,
                 error,
@@ -165,8 +171,6 @@ export class RbacServiceCore implements IRbacServiceCore {
 export class RbacService implements IAgentManagerService {
     private readonly moduleAllowedMatrices: string[];
 
-    private readonly logger: RBACLogger;
-
     constructor(
         @Optional()
         @Inject(RBAC_LOGGER)
@@ -177,8 +181,13 @@ export class RbacService implements IAgentManagerService {
         @Inject(RBAC_FEATURE_MATRICES)
         public readonly availableMatrices: PermissionsResolverType[],
     ) {
-        this.logger = logger ?? new DefaultRBACLogger();
-        this.core.logger = this.logger;
+        // Логгер root-инстанса (`forRoot`/`forTesting` — единственные, кто передаёт
+        // `baseResolver`) авторитетен и перезаписывает логгер feature-инстанса.
+        // Feature-инстанс (`forFeature`) пишет в общее ядро только если логгер ещё
+        // не задан, чтобы не затирать опцию `forRoot` своим fallback/global-логгером.
+        if (baseResolver || !this.core.logger) {
+            this.core.logger = logger ?? new DefaultRBACLogger();
+        }
 
         if (baseResolver) {
             if (this.core.baseResolver) {
@@ -219,7 +228,7 @@ export class RbacService implements IAgentManagerService {
             throw new Error('[RBAC] RbacService.availableMatrices is not defined');
         }
 
-        return new RBACAgentManager(this, scope, baseRoles, this.logger);
+        return new RBACAgentManager(this, scope, baseRoles, this.core.currentLogger);
     }
 
     public getPermissionMatrix<

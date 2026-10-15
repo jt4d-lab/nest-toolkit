@@ -305,6 +305,17 @@ describe('RBAC / DefaultRBACLogger', () => {
             });
         });
 
+        it('пустой scope-объект сериализуется в пустую строку', () => {
+            const { calls, sink } = createFakeSink();
+            const logger = new DefaultRBACLogger({}, sink);
+
+            logger.accessGranted({ ...listGrantedEvent, scope: {} });
+
+            expect(calls[0]?.details).toMatchObject({
+                scope: '',
+            });
+        });
+
         it('в событии доступа есть только ключ scope или только ключ entity', () => {
             const { calls, sink } = createFakeSink();
             const logger = new DefaultRBACLogger({}, sink);
@@ -366,28 +377,26 @@ describe('RBAC / DefaultRBACLogger', () => {
             details?: unknown;
         }
 
-        const captured: NestCall[] = [];
-
-        const spies: Array<ReturnType<typeof vi.spyOn>> = [];
+        let captured: NestCall[] = [];
 
         beforeEach(() => {
+            captured = [];
+
             const methods: NestLoggerMethod[] = ['debug', 'log', 'warn', 'error'];
 
             methods.forEach((method) => {
-                spies.push(
-                    vi.spyOn(NestLogger.prototype, method).mockImplementation(function (
-                        this: unknown,
-                        message: unknown,
-                        ...optionalParams: unknown[]
-                    ) {
-                        captured.push({
-                            method,
-                            context: (this as { context?: string }).context,
-                            message,
-                            details: optionalParams[0],
-                        });
-                    }),
-                );
+                vi.spyOn(NestLogger.prototype, method).mockImplementation(function (
+                    this: unknown,
+                    message: unknown,
+                    ...optionalParams: unknown[]
+                ) {
+                    captured.push({
+                        method,
+                        context: (this as { context?: string }).context,
+                        message,
+                        details: optionalParams[0],
+                    });
+                });
             });
         });
 

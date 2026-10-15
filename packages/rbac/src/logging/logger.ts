@@ -95,7 +95,7 @@ class NestLoggerSink implements RBACLogSink {
  * scope-объект — в строку, массивы прав — в строки через `', '`.
  */
 export class DefaultRBACLogger implements RBACLogger {
-    private readonly levels: Record<RBACEventType, RBACLogLevel | false>;
+    private readonly levels: Partial<Record<RBACEventType, RBACLogLevel | false>>;
     private readonly prefix?: string;
     private readonly sink: RBACLogSink;
 
@@ -160,7 +160,7 @@ export class DefaultRBACLogger implements RBACLogger {
     }
 
     private emit(type: RBACEventType, message: string, details: object): void {
-        const level = this.levels[type];
+        const level = this.levels[type] ?? DEFAULT_LOG_LEVELS[type];
 
         if (level === false) {
             return;

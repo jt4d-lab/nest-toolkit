@@ -161,6 +161,25 @@ describe('RBAC / TestingRBACLogger', () => {
             logger.accessGranted().withDetails({ matrix: 'nope' }).toBeNotLogged();
         });
 
+        it('withDetails: Error-значения сравниваются по имени и сообщению', () => {
+            const logger = new TestingRBACLogger();
+
+            logger.matrixInstantiateFailed(matrixInstantiateFailedEvent);
+
+            logger
+                .matrixInstantiateFailed()
+                .withDetails({ error: new Error('boom') })
+                .toBeLoggedOnce();
+            logger
+                .matrixInstantiateFailed()
+                .withDetails({ error: new Error('bam') })
+                .toBeNotLogged();
+            logger
+                .matrixInstantiateFailed()
+                .withDetails({ error: new TypeError('boom') })
+                .toBeNotLogged();
+        });
+
         it('withDetails конкатенирует подмножества', () => {
             const logger = new TestingRBACLogger();
 

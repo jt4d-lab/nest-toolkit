@@ -114,7 +114,9 @@ export interface MatrixInitFailedEvent {
 /**
  * RBAC-событие: структурный payload лог-записи.
  *
- * Поле `type` в payload отсутствует — дискриминатором является имя метода `RBACLogger`.
+ * Собственного поля-дискриминатора `type` в payload нет — дискриминатором является имя
+ * метода `RBACLogger`, принимающего событие. Поле `type` в payload событий
+ * `matrixInstantiateFailed`/`matrixInitFailed` — это имя класса резолвера, а не дискриминатор.
  */
 export type RBACEvent =
     | AccessGrantedEvent

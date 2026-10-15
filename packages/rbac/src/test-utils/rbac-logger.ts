@@ -1,4 +1,5 @@
 import { DynamicModule, Module } from '@nestjs/common';
+import { equals } from '@vitest/expect';
 
 import type {
     AccessDeniedEvent,
@@ -179,6 +180,11 @@ export class RBACTestingLoggerMatcher {
         this.fail(countLabel(n));
     }
 
+    /**
+     * Совпадение записи: тип события, наличие ключей (включая ключи со значением
+     * `undefined`) и глубокое равенство значений по семантике `toEqual` (`equals` из
+     * `@vitest/expect` игнорирует ключи со значением `undefined`).
+     */
     private matches(record: RBACLogRecord): boolean {
         if (this.type !== undefined && record.event !== this.type) {
             return false;
@@ -188,11 +194,11 @@ export class RBACTestingLoggerMatcher {
         delete payload.event;
 
         if (this.exact) {
-            return deepEquals(payload, this.details);
+            return hasSameKeys(payload, this.details) && equals(payload, this.details);
         }
 
         return Object.entries(this.details).every(([key, value]) => {
-            return deepEquals(payload[key], value);
+            return Object.hasOwn(payload, key) && equals(payload[key], value);
         });
     }
 
@@ -249,43 +255,13 @@ export class RBACTestingLoggerModule {
 }
 
 /**
- * Глубокое равенство значений payload (строки, числа, булевы, массивы,
- * простые объекты, `Error`). Ключи со значением `undefined` игнорируются —
- * как в семантике `toEqual`.
+ * Совпадают ли наборы ключей объектов (включая ключи со значением `undefined`).
  */
-function deepEquals(a: unknown, b: unknown): boolean {
-    if (Object.is(a, b)) {
-        return true;
-    }
+function hasSameKeys(a: Record<string, unknown>, b: Record<string, unknown>): boolean {
+    const aKeys = Object.keys(a);
+    const bKeys = Object.keys(b);
 
-    if (a === null || b === null || typeof a !== 'object' || typeof b !== 'object') {
-        return false;
-    }
-
-    if (a instanceof Error || b instanceof Error) {
-        return (
-            a instanceof Error && b instanceof Error && a.name === b.name && a.message === b.message
-        );
-    }
-
-    if (Array.isArray(a) || Array.isArray(b)) {
-        return (
-            Array.isArray(a) &&
-            Array.isArray(b) &&
-            a.length === b.length &&
-            a.every((value, i) => deepEquals(value, b[i]))
-        );
-    }
-
-    const objA = a as Record<string, unknown>;
-    const objB = b as Record<string, unknown>;
-    const aKeys = Object.keys(objA).filter((key) => objA[key] !== undefined);
-    const bKeys = Object.keys(objB).filter((key) => objB[key] !== undefined);
-
-    return (
-        aKeys.length === bKeys.length &&
-        aKeys.every((key) => Object.hasOwn(objB, key) && deepEquals(objA[key], objB[key]))
-    );
+    return aKeys.length === bKeys.length && aKeys.every((key) => Object.hasOwn(b, key));
 }
 
 function countLabel(count: number): string {
