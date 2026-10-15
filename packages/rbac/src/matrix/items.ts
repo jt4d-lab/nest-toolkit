@@ -1,7 +1,7 @@
 import { EmptyObject } from '../empty-object';
 import { EntityWithPermission } from '../permissions';
 
-import { ItemType, Permission, Role, Rule, ScopeType } from './types';
+import { ItemType, Role, Rule, ScopeType } from './types';
 
 export const Roles = {
     any: createRole('ΔAny'),
@@ -14,13 +14,6 @@ export function createRole(name: string, extendRoles: Role[] = []): Role {
         type: ItemType.Role,
         name,
         extendRoles,
-    };
-}
-
-export function createPermission(name: string): Permission {
-    return {
-        type: ItemType.Permission,
-        name,
     };
 }
 

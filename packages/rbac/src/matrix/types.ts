@@ -9,7 +9,6 @@ export enum ItemType {
     Rule = 'ΔRule',
     AndOperator = 'ΔAndOperator',
     OrOperator = 'ΔOrOperator',
-    Permission = 'ΔPermission',
     RelatedPermission = 'ΔRelatedPermission',
     Matrix = 'ΔMatrix',
 }
@@ -23,14 +22,6 @@ export interface Role {
     readonly type: ItemType.Role;
     readonly name: string;
     readonly extendRoles: Role[];
-}
-
-/**
- * Разрешение: право на выполнение определенной операции или доступ к определенным ресурсам
- */
-export interface Permission {
-    readonly type: ItemType.Permission;
-    readonly name: string;
 }
 
 /**
