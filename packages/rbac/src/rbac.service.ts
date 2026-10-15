@@ -4,10 +4,11 @@ import { RBACAgentManager } from './agent/manager';
 import { IAgentManagerService } from './agent/types';
 import { getMeta } from './decorators';
 import { EmptyObject } from './empty-object';
-import { Logger } from './logger';
+import { DefaultRBACLogger } from './logging';
+import type { RBACLogger } from './logging';
 import { RelatedEntities, Role, ScopeType, SystemRoles } from './matrix';
 import { EntityWithPermission } from './permissions';
-import { RBAC_BASE_RESOLVER, RBAC_FEATURE_MATRICES } from './rbac.providers';
+import { RBAC_BASE_RESOLVER, RBAC_FEATURE_MATRICES, RBAC_LOGGER } from './rbac.providers';
 import type {
     BaseResolver,
     GetBaseRoles,
@@ -40,10 +41,10 @@ interface InstanceResolver {
 @Injectable()
 export class RbacServiceCore implements IRbacServiceCore {
     baseResolver: BaseResolver;
+    logger?: RBACLogger;
 
     private rawMatrices = new Map<string, RawPermissionsResolver>();
     private matrices = new Map<string, PermissionsCoordinator>();
-    private readonly logger = new Logger('RBAC');
 
     public getBaseScope(req: Request) {
         return this.baseResolver.getBaseScope(req);
@@ -96,37 +97,38 @@ export class RbacServiceCore implements IRbacServiceCore {
     }
 
     public async initMatrices(resolver: InstanceResolver): Promise<void> {
-        this.logger.log('Initializing matrices...');
-
+        const logger = this.logger ?? new DefaultRBACLogger();
         let matrices = Array.from(this.rawMatrices.values());
 
         for (const item of matrices) {
-            await this.instantiateMatrix(item, resolver);
+            await this.instantiateMatrix(item, resolver, logger);
         }
 
         matrices = reorderMatrices(this.rawMatrices);
 
-        matrices.forEach((item) => this.initMatrix(item));
+        matrices.forEach((item) => this.initMatrix(item, logger));
     }
 
     private async instantiateMatrix(
         item: RawPermissionsResolver,
         resolver: InstanceResolver,
+        logger: RBACLogger,
     ): Promise<void> {
         const name = item.meta.name;
 
         try {
             item.service = await resolver.resolve(item.type);
         } catch (error) {
-            this.logger.error(
-                `Failed to create an instance of the matrix "${name}" (${item.type.name})`,
-                error as Error,
-            );
+            logger.matrixInstantiateFailed({
+                matrix: name,
+                type: item.type.name,
+                error,
+            });
             throw error;
         }
     }
 
-    private initMatrix(item: RawPermissionsResolver): void {
+    private initMatrix(item: RawPermissionsResolver, logger: RBACLogger): void {
         const name = item.meta.name;
 
         try {
@@ -147,12 +149,13 @@ export class RbacServiceCore implements IRbacServiceCore {
                 new PermissionsCoordinator(item.meta, service, relatedMatrices),
             );
 
-            this.logger.log(`Matrix "${name}" initialized`);
+            logger.matrixInitialized({ matrix: name });
         } catch (error) {
-            this.logger.error(
-                `Matrix "${name}" (${item.type.name}) initialization failed`,
-                error as Error,
-            );
+            logger.matrixInitFailed({
+                matrix: name,
+                type: item.type.name,
+                error,
+            });
             throw error;
         }
     }
@@ -162,18 +165,20 @@ export class RbacServiceCore implements IRbacServiceCore {
 export class RbacService implements IAgentManagerService {
     private readonly moduleAllowedMatrices: string[];
 
-    private readonly logger: Logger;
+    private readonly logger: RBACLogger;
 
     constructor(
-        @Optional() logger: Logger,
+        @Optional()
+        @Inject(RBAC_LOGGER)
+        logger: RBACLogger,
         private readonly core: RbacServiceCore,
         @Optional() @Inject(RBAC_BASE_RESOLVER) baseResolver: BaseResolver,
         @Optional()
         @Inject(RBAC_FEATURE_MATRICES)
         public readonly availableMatrices: PermissionsResolverType[],
     ) {
-        this.logger = logger ?? new Logger('RBAC');
-        this.logger.setContext('RBAC');
+        this.logger = logger ?? new DefaultRBACLogger();
+        this.core.logger = this.logger;
 
         if (baseResolver) {
             if (this.core.baseResolver) {

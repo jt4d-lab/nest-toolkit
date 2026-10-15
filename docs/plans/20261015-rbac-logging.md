@@ -290,28 +290,28 @@ export class DefaultRBACLogger implements RBACLogger {
 - Modify: `packages/rbac/src/__tests__/module/request-level-cache.spec.ts`
 - Modify: `packages/rbac/src/mock/createRbacMocker.spec.ts`
 
-- [ ] `rbac.providers.ts`: добавить `RBAC_LOGGER = 'RBAC_LOGGER'`
-- [ ] `rbac.module.ts`: `forRoot({ baseResolver, logger? })` — регистрировать провайдер
+- [x] `rbac.providers.ts`: добавить `RBAC_LOGGER = 'RBAC_LOGGER'` (введено в task 2)
+- [x] `rbac.module.ts`: `forRoot({ baseResolver, logger? })` — регистрировать провайдер
       `RBAC_LOGGER` при наличии опции
-- [ ] `RbacServiceCore`: публичное свойство `logger?: RBACLogger`, холодный путь через
+- [x] `RbacServiceCore`: публичное свойство `logger?: RBACLogger`, холодный путь через
       `?? new DefaultRBACLogger()`; шлёт матричные события (с `type` в failed), строка «Initializing
       matrices…» удаляется
-- [ ] `RbacService`: `@Optional() @Inject(RBAC_LOGGER)` + fallback `new DefaultRBACLogger()`; в
+- [x] `RbacService`: `@Optional() @Inject(RBAC_LOGGER)` + fallback `new DefaultRBACLogger()`; в
       конструкторе `this.core.logger = this.logger`; убрать `setContext('RBAC')`; прокинуть логгер в
       `RBACAgentManager`
-- [ ] `RBACAgentManager`, `ListAgentLogs`, `EntityAgentLogs`: `RBACLogger`; события
+- [x] `RBACAgentManager`, `ListAgentLogs`, `EntityAgentLogs`: `RBACLogger`; события
       `accessGranted/accessDenied/scopeNotFound/entityNotFound` со структурным payload; нормализация
       `permissions` в `string[]`; убрать `serializeScope` из `list-agent-logs.ts`
-- [ ] `agent/types.ts`: удалить константы
+- [x] `agent/types.ts`: удалить константы
       `ACCESS_GRANTED/ACCESS_DENIED/SCOPE_NOT_FOUND/     ENTITY_NOT_FOUND`; удалить `src/logger.ts`
       и `src/test-utils/logger.ts`
-- [ ] `index.ts`: убрать `Logger`; добавить экспорт logging-модуля и `RBAC_LOGGER`
-- [ ] миграция `list-agent.spec.ts` и `entity-agent.spec.ts`: ассерты на события
+- [x] `index.ts`: убрать `Logger`; добавить экспорт logging-модуля и `RBAC_LOGGER`
+- [x] миграция `list-agent.spec.ts` и `entity-agent.spec.ts`: ассерты на события
       (`logger.accessGranted().withDetails({...})`, scope-объект, массивы прав)
-- [ ] миграция `permissions.spec.ts`, `request-level-cache.spec.ts`, `createRbacMocker.spec.ts`:
+- [x] миграция `permissions.spec.ts`, `request-level-cache.spec.ts`, `createRbacMocker.spec.ts`:
       заменить `LocalLoggerModule.forTesting()` на `RBACTestingLoggerModule.forTesting()`
       (global-модуль — единственный путь, которым логгер доходит до `RbacService` из корня тестов)
-- [ ] выполнить `nx test rbac`, `nx typecheck rbac`, `nx lint-check rbac` — зелёно
+- [x] выполнить `nx test rbac`, `nx typecheck rbac`, `nx lint-check rbac` — зелёно
 
 ### Task 4: Модульный тест логирования-обвязки (fallback / forRoot / токен)
 

@@ -16,7 +16,7 @@ import { RBACAgentManager } from '../agent';
 import { getMeta } from '../decorators';
 import { RBACPipe } from '../decorators/rbac.decorator';
 import { EntityWithPermission } from '../permissions';
-import { LocalLoggerModule } from '../test-utils/logger';
+import { RBACTestingLoggerModule } from '../test-utils/rbac-logger';
 
 import { createRbacMocker } from './createRbacMocker';
 
@@ -84,7 +84,7 @@ describe('createRbacMocker', () => {
         const rbac = createRbacMocker(DemoRBAC);
 
         const module = await Test.createTestingModule({
-            imports: [rbac.module, LocalLoggerModule.forTesting()],
+            imports: [rbac.module, RBACTestingLoggerModule.forTesting()],
         }).compile();
 
         await rbac.init(module);
@@ -106,7 +106,7 @@ describe('createRbacMocker', () => {
             rbac = createRbacMocker(DemoRBAC);
 
             app = await Test.createTestingModule({
-                imports: [rbac.module, LocalLoggerModule.forTesting()],
+                imports: [rbac.module, RBACTestingLoggerModule.forTesting()],
             }).compile();
 
             await rbac.init(app);
@@ -157,7 +157,7 @@ describe('createRbacMocker', () => {
             const rbac = createRbacMocker(DemoRBAC);
 
             const app = await Test.createTestingModule({
-                imports: [rbac.module, LocalLoggerModule.forTesting()],
+                imports: [rbac.module, RBACTestingLoggerModule.forTesting()],
             }).compile();
 
             // check getAgent
@@ -197,7 +197,7 @@ describe('createRbacMocker', () => {
             class DemoModule {}
 
             const module = await Test.createTestingModule({
-                imports: [rbac.module, DemoModule, LocalLoggerModule.forTesting()],
+                imports: [rbac.module, DemoModule, RBACTestingLoggerModule.forTesting()],
             }).compile();
 
             app = module.createNestApplication();

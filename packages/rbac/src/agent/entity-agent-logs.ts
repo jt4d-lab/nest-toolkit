@@ -1,9 +1,8 @@
-import { Logger } from '../logger';
+import type { RBACLogger } from '../logging';
 import { EntityWithPermission, PermissionFromEntity } from '../permissions';
 import { RelatedResolverIdTypes } from '../types';
 
 import { AgentPermissionHelper } from './agent-permission-helper';
-import { ACCESS_DENIED, ACCESS_GRANTED, ENTITY_NOT_FOUND } from './types';
 
 export class EntityAgentLogs<
     ID extends number | string = number | string,
@@ -11,7 +10,7 @@ export class EntityAgentLogs<
     Related extends RelatedResolverIdTypes = null,
 > {
     constructor(
-        private readonly logger: Logger,
+        private readonly logger: RBACLogger,
         private readonly helper: AgentPermissionHelper<ID, Entity, Related>,
     ) {}
 
@@ -20,7 +19,7 @@ export class EntityAgentLogs<
         entity: ID | Entity,
         mode: 'some' | 'every' = 'every',
     ): void {
-        this.logger.debug(ACCESS_GRANTED, this.prepareLogDetails(permissions, entity, mode));
+        this.logger.accessGranted(this.prepareAccessEvent(permissions, entity, mode));
     }
 
     accessDenied(
@@ -28,14 +27,14 @@ export class EntityAgentLogs<
         entity: ID | Entity,
         mode: 'some' | 'every' = 'every',
     ): void {
-        this.logger.warn(ACCESS_DENIED, this.prepareLogDetails(permissions, entity, mode));
+        this.logger.accessDenied(this.prepareAccessEvent(permissions, entity, mode));
     }
 
     notFound(entity?: ID | Entity): void {
-        this.logger.warn(ENTITY_NOT_FOUND, this.prepareLogBaseDetails(entity));
+        this.logger.entityNotFound(this.prepareBaseEvent(entity));
     }
 
-    private prepareLogBaseDetails(entity?: ID | Entity) {
+    private prepareBaseEvent(entity?: ID | Entity) {
         return {
             matrix: this.helper.matrix.name,
             entity: entity ? this.helper.getEntityId(entity) : undefined,
@@ -43,18 +42,16 @@ export class EntityAgentLogs<
         };
     }
 
-    private prepareLogDetails(
+    private prepareAccessEvent(
         permissions: PermissionFromEntity<Entity> | PermissionFromEntity<Entity>[],
         entity: ID | Entity,
         mode: 'some' | 'every' = 'every',
-        reason?: string,
     ) {
         return {
-            ...this.prepareLogBaseDetails(entity),
-            grantedPermissions: this.helper.getPermissions(entity).join(', ') || '(none)',
-            requiredPermissions: Array.isArray(permissions) ? permissions.join(', ') : permissions,
+            ...this.prepareBaseEvent(entity),
+            grantedPermissions: this.helper.getPermissions(entity),
+            requiredPermissions: Array.isArray(permissions) ? permissions : [permissions],
             mode,
-            ...(reason && { reason }),
         };
     }
 }

@@ -3,7 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import supertest from 'supertest';
 
 import { RbacModule } from '../..';
-import { LocalLoggerModule } from '../../test-utils/logger';
+import { RBACTestingLoggerModule } from '../../test-utils/rbac-logger';
 
 import { ArticlesModule } from './data/articles.module';
 import { BaseModule, BaseResolverMock } from './data/base.module';
@@ -23,7 +23,7 @@ describe('RBAC module / permissions', () => {
                 RbacModule.forRoot({
                     baseResolver: BaseResolverMock,
                 }),
-                LocalLoggerModule.forTesting(),
+                RBACTestingLoggerModule.forTesting(),
             ],
             providers: [],
         }).compile();

@@ -1,5 +1,5 @@
 import { getMeta } from '../decorators';
-import { Logger } from '../logger';
+import type { RBACLogger } from '../logging';
 import { Role, ScopeType } from '../matrix';
 import { EntityWithPermission } from '../permissions';
 import { PermissionsCoordinator, PermissionsResolverType } from '../resolver';
@@ -41,7 +41,7 @@ export class RBACAgentManager {
         private readonly service: IAgentManagerService,
         private readonly baseScope: ScopeType,
         private readonly baseRoles: Role[],
-        private readonly logger: Logger,
+        private readonly logger: RBACLogger,
     ) {
         service.availableMatrices.forEach((matrix) =>
             this.items.set(getMeta(matrix).name, {

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { RbacModule, RbacService } from '../..';
-import { LocalLoggerModule } from '../../test-utils/logger';
+import { RBACTestingLoggerModule } from '../../test-utils/rbac-logger';
 
 import { ArticleRBAC } from './data/article.rbac';
 import { BaseModule } from './data/base.module';
@@ -17,7 +17,7 @@ describe('RBAC module / request-level cache ', () => {
         module = await Test.createTestingModule({
             imports: [
                 RbacModule.forTesting([ArticleRBAC, OrgRBAC]),
-                LocalLoggerModule.forTesting(),
+                RBACTestingLoggerModule.forTesting(),
                 BaseModule,
             ],
             providers: [ArticleRBAC, OrgRBAC],

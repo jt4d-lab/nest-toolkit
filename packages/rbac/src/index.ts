@@ -3,6 +3,22 @@ export { createRole, SystemRoles } from './matrix';
 export type { ScopeType, Role } from './matrix';
 export { RBAC, RBACMatrix } from './decorators';
 export { RbacService } from './rbac.service';
+export { RBAC_LOGGER } from './rbac.providers';
+export type { RBACLogger, RBACLoggerOptions, RBACLogSink } from './logging';
+export type {
+    RBACEvent,
+    RBACEventType,
+    RBACLogLevel,
+    AccessEventBase,
+    AccessGrantedEvent,
+    AccessDeniedEvent,
+    ScopeNotFoundEvent,
+    EntityNotFoundEvent,
+    MatrixInitializedEvent,
+    MatrixInstantiateFailedEvent,
+    MatrixInitFailedEvent,
+} from './logging';
+export { DefaultRBACLogger } from './logging';
 export type { PermissionsResolver, PermissionsResolverType, UpdateRolesProps } from './resolver';
 export type {
     BaseResolver,
@@ -32,5 +48,3 @@ export {
     RBACAgentManager,
     type RBACGetter,
 } from './agent';
-
-export { Logger } from './logger';

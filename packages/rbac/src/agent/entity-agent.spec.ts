@@ -10,7 +10,7 @@ import {
     SystemRoles,
 } from '..';
 import { EntityWithPermission } from '../permissions';
-import { LocalLoggerModule, TestingLogger, TestingLoggerMatcher } from '../test-utils/logger';
+import { RBACTestingLoggerModule, TestingRBACLogger } from '../test-utils/rbac-logger';
 
 interface Article extends EntityWithPermission<'read' | 'edit' | 'delete'> {
     id: number;
@@ -18,7 +18,7 @@ interface Article extends EntityWithPermission<'read' | 'edit' | 'delete'> {
 
 describe('RBAC / EntityAgent', () => {
     let module: TestingModule;
-    let logger: TestingLoggerMatcher;
+    let logger: TestingRBACLogger;
     let service: RbacService;
     let entityAgent: RBACEntityAgent<number, Article>;
 
@@ -49,14 +49,14 @@ describe('RBAC / EntityAgent', () => {
 
     beforeEach(async () => {
         module = await Test.createTestingModule({
-            imports: [RbacModule.forTesting([ArticleRBAC]), LocalLoggerModule.forTesting()],
+            imports: [RbacModule.forTesting([ArticleRBAC]), RBACTestingLoggerModule.forTesting()],
             providers: [ArticleRBAC],
         }).compile();
 
         await module.get<RbacModule>(RbacModule).init(module);
 
         service = module.get<RbacService>(RbacService);
-        logger = module.get(TestingLogger).withContext('RBAC').strictDetails();
+        logger = module.get(TestingRBACLogger);
 
         const manager = await service.createManager({
             loggedIn: true,
@@ -93,14 +93,13 @@ describe('RBAC / EntityAgent', () => {
 
                 // Assert
                 logger
-                    .withLevel('debug')
-                    .withMessage('Access granted')
+                    .accessGranted()
                     .withDetails({
                         matrix: 'article',
                         entity: 1,
                         user: 101,
-                        grantedPermissions: 'read, edit',
-                        requiredPermissions: 'read',
+                        grantedPermissions: ['read', 'edit'],
+                        requiredPermissions: ['read'],
                         mode: 'every',
                     })
                     .toBeLoggedTimes(2);
@@ -113,14 +112,13 @@ describe('RBAC / EntityAgent', () => {
 
                 // Assert
                 logger
-                    .withLevel('debug')
-                    .withMessage('Access granted')
+                    .accessGranted()
                     .withDetails({
                         matrix: 'article',
                         entity: 1,
                         user: 101,
-                        grantedPermissions: 'read, edit',
-                        requiredPermissions: 'read, edit',
+                        grantedPermissions: ['read', 'edit'],
+                        requiredPermissions: ['read', 'edit'],
                         mode: 'every',
                     })
                     .toBeLoggedTimes(2);
@@ -133,14 +131,13 @@ describe('RBAC / EntityAgent', () => {
 
                 // Assert
                 logger
-                    .withLevel('debug')
-                    .withMessage('Access granted')
+                    .accessGranted()
                     .withDetails({
                         matrix: 'article',
                         entity: 1,
                         user: 101,
-                        grantedPermissions: 'read, edit',
-                        requiredPermissions: 'read, edit',
+                        grantedPermissions: ['read', 'edit'],
+                        requiredPermissions: ['read', 'edit'],
                         mode: 'some',
                     })
                     .toBeLoggedTimes(2);
@@ -155,14 +152,13 @@ describe('RBAC / EntityAgent', () => {
 
                 // Assert
                 logger
-                    .withLevel('warn')
-                    .withMessage('Access denied')
+                    .accessDenied()
                     .withDetails({
                         matrix: 'article',
                         entity: 2,
                         user: 101,
-                        grantedPermissions: 'read',
-                        requiredPermissions: 'edit',
+                        grantedPermissions: ['read'],
+                        requiredPermissions: ['edit'],
                         mode: 'every',
                     })
                     .toBeLoggedTimes(2);
@@ -175,14 +171,13 @@ describe('RBAC / EntityAgent', () => {
 
                 // Assert
                 logger
-                    .withLevel('warn')
-                    .withMessage('Access denied')
+                    .accessDenied()
                     .withDetails({
                         matrix: 'article',
                         entity: 2,
                         user: 101,
-                        grantedPermissions: 'read',
-                        requiredPermissions: 'read, edit',
+                        grantedPermissions: ['read'],
+                        requiredPermissions: ['read', 'edit'],
                         mode: 'every',
                     })
                     .toBeLoggedTimes(2);
@@ -195,14 +190,13 @@ describe('RBAC / EntityAgent', () => {
 
                 // Assert
                 logger
-                    .withLevel('warn')
-                    .withMessage('Access denied')
+                    .accessDenied()
                     .withDetails({
                         matrix: 'article',
                         entity: 2,
                         user: 101,
-                        grantedPermissions: 'read',
-                        requiredPermissions: 'read, edit',
+                        grantedPermissions: ['read'],
+                        requiredPermissions: ['read', 'edit'],
                         mode: 'some',
                     })
                     .toBeLoggedTimes(2);
@@ -216,8 +210,7 @@ describe('RBAC / EntityAgent', () => {
 
                 // Assert
                 logger
-                    .withLevel('warn')
-                    .withMessage('Entity not found')
+                    .entityNotFound()
                     .withDetails({
                         matrix: 'article',
                         entity: 404,
@@ -232,8 +225,7 @@ describe('RBAC / EntityAgent', () => {
 
                 // Assert
                 logger
-                    .withLevel('warn')
-                    .withMessage('Entity not found')
+                    .entityNotFound()
                     .withDetails({
                         matrix: 'article',
                         user: 101,
@@ -248,14 +240,13 @@ describe('RBAC / EntityAgent', () => {
                 await expect(entityAgent.check('read', { id: 1 })).resolves.toBeUndefined();
 
                 logger
-                    .withLevel('debug')
-                    .withMessage('Access granted')
+                    .accessGranted()
                     .withDetails({
                         matrix: 'article',
                         entity: 1,
                         user: 101,
-                        grantedPermissions: 'read, edit',
-                        requiredPermissions: 'read',
+                        grantedPermissions: ['read', 'edit'],
+                        requiredPermissions: ['read'],
                         mode: 'every',
                     })
                     .toBeLoggedOnce();
@@ -267,14 +258,13 @@ describe('RBAC / EntityAgent', () => {
                 });
 
                 logger
-                    .withLevel('warn')
-                    .withMessage('Access denied')
+                    .accessDenied()
                     .withDetails({
                         matrix: 'article',
                         entity: 2,
                         user: 101,
-                        grantedPermissions: 'read',
-                        requiredPermissions: 'edit',
+                        grantedPermissions: ['read'],
+                        requiredPermissions: ['edit'],
                         mode: 'every',
                     })
                     .toBeLoggedOnce();
@@ -287,8 +277,7 @@ describe('RBAC / EntityAgent', () => {
 
                 // Assert
                 logger
-                    .withLevel('warn')
-                    .withMessage('Entity not found')
+                    .entityNotFound()
                     .withDetails({
                         matrix: 'article',
                         entity: 404,
@@ -306,14 +295,13 @@ describe('RBAC / EntityAgent', () => {
 
                 // Assert
                 logger
-                    .withLevel('warn')
-                    .withMessage('Access denied')
+                    .accessDenied()
                     .withDetails({
                         matrix: 'article',
                         entity: 2,
                         user: 101,
-                        grantedPermissions: 'read',
-                        requiredPermissions: 'edit',
+                        grantedPermissions: ['read'],
+                        requiredPermissions: ['edit'],
                         mode: 'every',
                     })
                     .toBeLoggedOnce();
@@ -328,8 +316,7 @@ describe('RBAC / EntityAgent', () => {
 
                 // Assert
                 logger
-                    .withLevel('warn')
-                    .withMessage('Entity not found')
+                    .entityNotFound()
                     .withDetails({
                         matrix: 'article',
                         user: 101,
@@ -345,14 +332,13 @@ describe('RBAC / EntityAgent', () => {
                 ).resolves.toBeUndefined();
 
                 logger
-                    .withLevel('debug')
-                    .withMessage('Access granted')
+                    .accessGranted()
                     .withDetails({
                         matrix: 'article',
                         entity: 1,
                         user: 101,
-                        grantedPermissions: 'read, edit',
-                        requiredPermissions: 'read, edit',
+                        grantedPermissions: ['read', 'edit'],
+                        requiredPermissions: ['read', 'edit'],
                         mode: 'some',
                     })
                     .toBeLoggedOnce();
@@ -366,14 +352,13 @@ describe('RBAC / EntityAgent', () => {
                 });
 
                 logger
-                    .withLevel('warn')
-                    .withMessage('Access denied')
+                    .accessDenied()
                     .withDetails({
                         matrix: 'article',
                         entity: 2,
                         user: 101,
-                        grantedPermissions: 'read',
-                        requiredPermissions: 'edit, delete',
+                        grantedPermissions: ['read'],
+                        requiredPermissions: ['edit', 'delete'],
                         mode: 'some',
                     })
                     .toBeLoggedOnce();
@@ -385,8 +370,7 @@ describe('RBAC / EntityAgent', () => {
                 });
 
                 logger
-                    .withLevel('warn')
-                    .withMessage('Entity not found')
+                    .entityNotFound()
                     .withDetails({
                         matrix: 'article',
                         entity: 404,
@@ -402,14 +386,13 @@ describe('RBAC / EntityAgent', () => {
 
                 // Assert
                 logger
-                    .withLevel('debug')
-                    .withMessage('Access granted')
+                    .accessGranted()
                     .withDetails({
                         matrix: 'article',
                         entity: 1,
                         user: 101,
-                        grantedPermissions: 'read, edit',
-                        requiredPermissions: 'read',
+                        grantedPermissions: ['read', 'edit'],
+                        requiredPermissions: ['read'],
                         mode: 'every',
                     })
                     .toBeLoggedOnce();
@@ -424,14 +407,13 @@ describe('RBAC / EntityAgent', () => {
 
                 // Assert
                 logger
-                    .withLevel('warn')
-                    .withMessage('Access denied')
+                    .accessDenied()
                     .withDetails({
                         matrix: 'article',
                         entity: 1,
                         user: 101,
-                        grantedPermissions: 'read, edit',
-                        requiredPermissions: 'read, delete',
+                        grantedPermissions: ['read', 'edit'],
+                        requiredPermissions: ['read', 'delete'],
                         mode: 'every',
                     })
                     .toBeLoggedOnce();
@@ -442,10 +424,8 @@ describe('RBAC / EntityAgent', () => {
                     status: 404,
                 });
 
-                // Assert
                 logger
-                    .withLevel('warn')
-                    .withMessage('Entity not found')
+                    .entityNotFound()
                     .withDetails({
                         matrix: 'article',
                         entity: 404,

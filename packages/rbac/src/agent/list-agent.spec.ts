@@ -10,7 +10,7 @@ import {
     SystemRoles,
 } from '..';
 import { EntityWithPermission } from '../permissions';
-import { LocalLoggerModule, TestingLogger, TestingLoggerMatcher } from '../test-utils/logger';
+import { RBACTestingLoggerModule, TestingRBACLogger } from '../test-utils/rbac-logger';
 
 import { ScopeRel } from './types';
 
@@ -26,7 +26,7 @@ interface Article extends EntityWithPermission<'read' | 'edit' | 'post' | 'delet
 describe('RBAC / ListAgent', () => {
     let module: TestingModule;
     let service: RbacService;
-    let logger: TestingLoggerMatcher;
+    let logger: TestingRBACLogger;
     let listAgent: RBACListAgent<number, Article, { author: number }>;
 
     @RBACMatrix(
@@ -96,7 +96,7 @@ describe('RBAC / ListAgent', () => {
         module = await Test.createTestingModule({
             imports: [
                 RbacModule.forTesting([ArticleRBAC, AuthorRBAC]),
-                LocalLoggerModule.forTesting(),
+                RBACTestingLoggerModule.forTesting(),
             ],
             providers: [ArticleRBAC, AuthorRBAC],
         }).compile();
@@ -104,7 +104,7 @@ describe('RBAC / ListAgent', () => {
         await module.get<RbacModule>(RbacModule).init(module);
 
         service = module.get<RbacService>(RbacService);
-        logger = module.get(TestingLogger).withContext('RBAC').strictDetails();
+        logger = module.get(TestingRBACLogger);
 
         const manager = await service.createManager({
             loggedIn: true,
@@ -123,14 +123,13 @@ describe('RBAC / ListAgent', () => {
 
                 // Assert
                 logger
-                    .withLevel('debug')
-                    .withMessage('Access granted')
+                    .accessGranted()
                     .withDetails({
                         matrix: 'article',
-                        scope: 'author: 1',
+                        scope: { author: 1 },
                         user: 1,
-                        grantedPermissions: 'read, post',
-                        requiredPermissions: 'read',
+                        grantedPermissions: ['read', 'post'],
+                        requiredPermissions: ['read'],
                         mode: 'every',
                     })
                     .toBeLoggedTimes(2);
@@ -143,14 +142,13 @@ describe('RBAC / ListAgent', () => {
 
                 // Assert
                 logger
-                    .withLevel('debug')
-                    .withMessage('Access granted')
+                    .accessGranted()
                     .withDetails({
                         matrix: 'article',
-                        scope: 'author: 1',
+                        scope: { author: 1 },
                         user: 1,
-                        grantedPermissions: 'read, post',
-                        requiredPermissions: 'read, post',
+                        grantedPermissions: ['read', 'post'],
+                        requiredPermissions: ['read', 'post'],
                         mode: 'every',
                     })
                     .toBeLoggedTimes(2);
@@ -163,14 +161,13 @@ describe('RBAC / ListAgent', () => {
 
                 // Assert
                 logger
-                    .withLevel('debug')
-                    .withMessage('Access granted')
+                    .accessGranted()
                     .withDetails({
                         matrix: 'article',
-                        scope: 'author: 1',
+                        scope: { author: 1 },
                         user: 1,
-                        grantedPermissions: 'read, post',
-                        requiredPermissions: 'read, edit',
+                        grantedPermissions: ['read', 'post'],
+                        requiredPermissions: ['read', 'edit'],
                         mode: 'some',
                     })
                     .toBeLoggedTimes(2);
@@ -185,14 +182,13 @@ describe('RBAC / ListAgent', () => {
 
                 // Assert
                 logger
-                    .withLevel('warn')
-                    .withMessage('Access denied')
+                    .accessDenied()
                     .withDetails({
                         matrix: 'article',
-                        scope: 'author: 2',
+                        scope: { author: 2 },
                         user: 1,
-                        grantedPermissions: 'read',
-                        requiredPermissions: 'post',
+                        grantedPermissions: ['read'],
+                        requiredPermissions: ['post'],
                         mode: 'every',
                     })
                     .toBeLoggedTimes(2);
@@ -205,14 +201,13 @@ describe('RBAC / ListAgent', () => {
 
                 // Assert
                 logger
-                    .withLevel('warn')
-                    .withMessage('Access denied')
+                    .accessDenied()
                     .withDetails({
                         matrix: 'article',
-                        scope: 'author: 2',
+                        scope: { author: 2 },
                         user: 1,
-                        grantedPermissions: 'read',
-                        requiredPermissions: 'read, edit',
+                        grantedPermissions: ['read'],
+                        requiredPermissions: ['read', 'edit'],
                         mode: 'every',
                     })
                     .toBeLoggedTimes(2);
@@ -225,14 +220,13 @@ describe('RBAC / ListAgent', () => {
 
                 // Assert
                 logger
-                    .withLevel('warn')
-                    .withMessage('Access denied')
+                    .accessDenied()
                     .withDetails({
                         matrix: 'article',
-                        scope: 'author: 2',
+                        scope: { author: 2 },
                         user: 1,
-                        grantedPermissions: 'read',
-                        requiredPermissions: 'read, edit',
+                        grantedPermissions: ['read'],
+                        requiredPermissions: ['read', 'edit'],
                         mode: 'some',
                     })
                     .toBeLoggedTimes(2);
@@ -252,11 +246,10 @@ describe('RBAC / ListAgent', () => {
 
                 // Assert
                 logger
-                    .withLevel('warn')
-                    .withMessage('Scope not found')
+                    .scopeNotFound()
                     .withDetails({
                         matrix: 'article',
-                        scope: 'author: 404, another: 3541d4b8-59e7-42b1-9552-f801dd27bcbb',
+                        scope: { author: 404, another: '3541d4b8-59e7-42b1-9552-f801dd27bcbb' },
                         user: 1,
                     })
                     .toBeLoggedTimes(2);
@@ -268,11 +261,10 @@ describe('RBAC / ListAgent', () => {
 
                 // Assert
                 logger
-                    .withLevel('warn')
-                    .withMessage('Scope not found')
+                    .scopeNotFound()
                     .withDetails({
                         matrix: 'article',
-                        scope: 'null',
+                        scope: undefined,
                         user: 1,
                     })
                     .toBeLoggedTimes(2);
@@ -313,14 +305,13 @@ describe('RBAC / ListAgent', () => {
                     await expect(listAgent.check('read')).resolves.toBeUndefined();
 
                     logger
-                        .withLevel('debug')
-                        .withMessage('Access granted')
+                        .accessGranted()
                         .withDetails({
                             matrix: 'article',
-                            scope: 'null',
+                            scope: undefined,
                             user: 1,
-                            grantedPermissions: 'read',
-                            requiredPermissions: 'read',
+                            grantedPermissions: ['read'],
+                            requiredPermissions: ['read'],
                             mode: 'every',
                         })
                         .toBeLoggedOnce();
@@ -332,14 +323,13 @@ describe('RBAC / ListAgent', () => {
                     });
 
                     logger
-                        .withLevel('warn')
-                        .withMessage('Access denied')
+                        .accessDenied()
                         .withDetails({
                             matrix: 'article',
-                            scope: 'null',
+                            scope: undefined,
                             user: 1,
-                            grantedPermissions: 'read',
-                            requiredPermissions: 'post',
+                            grantedPermissions: ['read'],
+                            requiredPermissions: ['post'],
                             mode: 'every',
                         })
                         .toBeLoggedOnce();
@@ -350,14 +340,13 @@ describe('RBAC / ListAgent', () => {
                     await expect(listAgent.check('read', { author: 1 })).resolves.toBeUndefined();
 
                     logger
-                        .withLevel('debug')
-                        .withMessage('Access granted')
+                        .accessGranted()
                         .withDetails({
                             matrix: 'article',
-                            scope: 'author: 1',
+                            scope: { author: 1 },
                             user: 1,
-                            grantedPermissions: 'read, post',
-                            requiredPermissions: 'read',
+                            grantedPermissions: ['read', 'post'],
+                            requiredPermissions: ['read'],
                             mode: 'every',
                         })
                         .toBeLoggedOnce();
@@ -371,14 +360,13 @@ describe('RBAC / ListAgent', () => {
                     );
 
                     logger
-                        .withLevel('warn')
-                        .withMessage('Access denied')
+                        .accessDenied()
                         .withDetails({
                             matrix: 'article',
-                            scope: 'author: 2',
+                            scope: { author: 2 },
                             user: 1,
-                            grantedPermissions: 'read',
-                            requiredPermissions: 'post',
+                            grantedPermissions: ['read'],
+                            requiredPermissions: ['post'],
                             mode: 'every',
                         })
                         .toBeLoggedOnce();
@@ -398,14 +386,13 @@ describe('RBAC / ListAgent', () => {
                     await expect(listAgent.checkSome(['read'])).resolves.toBeUndefined();
 
                     logger
-                        .withLevel('debug')
-                        .withMessage('Access granted')
+                        .accessGranted()
                         .withDetails({
                             matrix: 'article',
-                            scope: 'null',
+                            scope: undefined,
                             user: 1,
-                            grantedPermissions: 'read',
-                            requiredPermissions: 'read',
+                            grantedPermissions: ['read'],
+                            requiredPermissions: ['read'],
                             mode: 'some',
                         })
                         .toBeLoggedOnce();
@@ -417,14 +404,13 @@ describe('RBAC / ListAgent', () => {
                     });
 
                     logger
-                        .withLevel('warn')
-                        .withMessage('Access denied')
+                        .accessDenied()
                         .withDetails({
                             matrix: 'article',
-                            scope: 'null',
+                            scope: undefined,
                             user: 1,
-                            grantedPermissions: 'read',
-                            requiredPermissions: 'post',
+                            grantedPermissions: ['read'],
+                            requiredPermissions: ['post'],
                             mode: 'some',
                         })
                         .toBeLoggedOnce();
@@ -437,14 +423,13 @@ describe('RBAC / ListAgent', () => {
                     ).resolves.toBeUndefined();
 
                     logger
-                        .withLevel('debug')
-                        .withMessage('Access granted')
+                        .accessGranted()
                         .withDetails({
                             matrix: 'article',
-                            scope: 'author: 1',
+                            scope: { author: 1 },
                             user: 1,
-                            grantedPermissions: 'read, post',
-                            requiredPermissions: 'read, edit',
+                            grantedPermissions: ['read', 'post'],
+                            requiredPermissions: ['read', 'edit'],
                             mode: 'some',
                         })
                         .toBeLoggedOnce();
@@ -458,14 +443,13 @@ describe('RBAC / ListAgent', () => {
                     });
 
                     logger
-                        .withLevel('warn')
-                        .withMessage('Access denied')
+                        .accessDenied()
                         .withDetails({
                             matrix: 'article',
-                            scope: 'author: 2',
+                            scope: { author: 2 },
                             user: 1,
-                            grantedPermissions: 'read',
-                            requiredPermissions: 'edit, delete',
+                            grantedPermissions: ['read'],
+                            requiredPermissions: ['edit', 'delete'],
                             mode: 'some',
                         })
                         .toBeLoggedOnce();
@@ -487,14 +471,13 @@ describe('RBAC / ListAgent', () => {
                     await expect(listAgent.checkEvery(['read'])).resolves.toBeUndefined();
 
                     logger
-                        .withLevel('debug')
-                        .withMessage('Access granted')
+                        .accessGranted()
                         .withDetails({
                             matrix: 'article',
-                            scope: 'null',
+                            scope: undefined,
                             user: 1,
-                            grantedPermissions: 'read',
-                            requiredPermissions: 'read',
+                            grantedPermissions: ['read'],
+                            requiredPermissions: ['read'],
                             mode: 'every',
                         })
                         .toBeLoggedOnce();
@@ -506,14 +489,13 @@ describe('RBAC / ListAgent', () => {
                     });
 
                     logger
-                        .withLevel('warn')
-                        .withMessage('Access denied')
+                        .accessDenied()
                         .withDetails({
                             matrix: 'article',
-                            scope: 'null',
+                            scope: undefined,
                             user: 1,
-                            grantedPermissions: 'read',
-                            requiredPermissions: 'read, post',
+                            grantedPermissions: ['read'],
+                            requiredPermissions: ['read', 'post'],
                             mode: 'every',
                         })
                         .toBeLoggedOnce();
@@ -526,14 +508,13 @@ describe('RBAC / ListAgent', () => {
                     ).resolves.toBeUndefined();
 
                     logger
-                        .withLevel('debug')
-                        .withMessage('Access granted')
+                        .accessGranted()
                         .withDetails({
                             matrix: 'article',
-                            scope: 'author: 1',
+                            scope: { author: 1 },
                             user: 1,
-                            grantedPermissions: 'read, post',
-                            requiredPermissions: 'read',
+                            grantedPermissions: ['read', 'post'],
+                            requiredPermissions: ['read'],
                             mode: 'every',
                         })
                         .toBeLoggedOnce();
@@ -547,14 +528,13 @@ describe('RBAC / ListAgent', () => {
                     });
 
                     logger
-                        .withLevel('warn')
-                        .withMessage('Access denied')
+                        .accessDenied()
                         .withDetails({
                             matrix: 'article',
-                            scope: 'author: 1',
+                            scope: { author: 1 },
                             user: 1,
-                            grantedPermissions: 'read, post',
-                            requiredPermissions: 'read, delete',
+                            grantedPermissions: ['read', 'post'],
+                            requiredPermissions: ['read', 'delete'],
                             mode: 'every',
                         })
                         .toBeLoggedOnce();

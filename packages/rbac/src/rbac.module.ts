@@ -1,7 +1,13 @@
 import { DynamicModule, INestApplicationContext, Module, Type } from '@nestjs/common';
 
 import { RBACPipe } from './decorators/rbac.decorator';
-import { BaseResolver, RBAC_BASE_RESOLVER, RBAC_FEATURE_MATRICES } from './rbac.providers';
+import type { RBACLogger } from './logging';
+import {
+    BaseResolver,
+    RBAC_BASE_RESOLVER,
+    RBAC_FEATURE_MATRICES,
+    RBAC_LOGGER,
+} from './rbac.providers';
 import { RbacService, RbacServiceCore } from './rbac.service';
 import { PermissionsResolver } from './resolver';
 
@@ -13,6 +19,7 @@ class RbacModuleCore {}
 
 interface RbacRootModuleOptions {
     baseResolver: Type<BaseResolver>;
+    logger?: RBACLogger;
 }
 
 @Module({
@@ -26,11 +33,15 @@ export class RbacModule {
         await service.initMatrices(app);
     }
 
-    public static forRoot({ baseResolver }: RbacRootModuleOptions): DynamicModule {
+    public static forRoot({ baseResolver, logger }: RbacRootModuleOptions): DynamicModule {
         return {
             module: RbacModule,
             imports: [RbacModuleCore],
-            providers: [{ provide: RBAC_BASE_RESOLVER, useExisting: baseResolver }, RbacService],
+            providers: [
+                { provide: RBAC_BASE_RESOLVER, useExisting: baseResolver },
+                ...(logger ? [{ provide: RBAC_LOGGER, useValue: logger }] : []),
+                RbacService,
+            ],
         };
     }
 

@@ -17,8 +17,3 @@ export type RBACErrorCode = 403 | 404;
 export type ScopeRel<Related extends RelatedResolverIdTypes = null> = Related extends object
     ? Partial<Related> | undefined
     : undefined;
-
-export const ACCESS_GRANTED = 'Access granted';
-export const ACCESS_DENIED = 'Access denied';
-export const ENTITY_NOT_FOUND = 'Entity not found';
-export const SCOPE_NOT_FOUND = 'Scope not found';
