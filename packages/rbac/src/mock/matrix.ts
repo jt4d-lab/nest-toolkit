@@ -1,6 +1,5 @@
-import { Operators, RBACMatrix } from '..';
-import { getMeta } from '../decorators';
-import { ItemType, RelatedPermissionMap } from '../matrix';
+import { getMeta, RBACMatrix } from '../decorators';
+import { ItemType, Operators, RelatedPermissionMap } from '../matrix';
 import { EntityWithPermission } from '../permissions';
 import { PermissionsResolver, PermissionsResolverType } from '../resolver';
 

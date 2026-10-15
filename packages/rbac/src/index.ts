@@ -1,6 +1,31 @@
-export * from './rbac.module';
-export { createRole, Roles, Operators, type Role } from './matrix';
-export { type ScopeType } from './matrix';
+export { RbacModule } from './rbac.module';
+export { createRole, SystemRoles } from './matrix';
+export type { ScopeType, Role } from './matrix';
+export { RBAC, RBACMatrix } from './decorators';
+export { RbacService } from './rbac.service';
+export type { PermissionsResolver, PermissionsResolverType, UpdateRolesProps } from './resolver';
+export { rbacBaseResolverToken, rbacFeatureMatrices } from './rbac.providers';
+export type {
+    BaseResolver,
+    GetBaseScope,
+    GetBaseRoles,
+    GetBaseScopeResult,
+} from './rbac.providers';
+export type {
+    EntityWithPermission,
+    PermissionFromEntity,
+    EntityWithCalculatedPermissions,
+    PermissionList,
+} from './permissions';
+export {
+    can,
+    canFactory,
+    canSome,
+    canSomeFactory,
+    canEvery,
+    canEveryFactory,
+    createPermissionList,
+} from './permissions';
 export {
     RBACAgent,
     RBACEntityAgent,
@@ -8,19 +33,5 @@ export {
     RBACAgentManager,
     type RBACGetter,
 } from './agent';
-export { type RelatedResolverIdTypes } from './types';
-export {
-    type PermissionsResolver,
-    type PermissionsResolverType,
-    type UpdateRolesProps,
-} from './resolver';
-export { RbacService } from './rbac.service';
+
 export { Logger } from './logger';
-export { RBAC, RBACMatrix } from './decorators';
-export type {
-    BaseResolver,
-    GetBaseScope,
-    GetBaseRoles,
-    GetBaseScopeResult,
-} from './rbac.providers';
-export * from './permissions';
