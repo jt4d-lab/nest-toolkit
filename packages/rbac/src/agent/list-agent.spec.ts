@@ -1,7 +1,14 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { PermissionsResolver, RBACListAgent, RBACMatrix, RbacModule, RbacService, Roles } from '..';
+import {
+    PermissionsResolver,
+    RBACListAgent,
+    RBACMatrix,
+    RbacModule,
+    RbacService,
+    SystemRoles,
+} from '..';
 import { EntityWithPermission } from '../permissions';
 import { LocalLoggerModule, TestingLogger, TestingLoggerMatcher } from '../test-utils/logger';
 
@@ -28,7 +35,7 @@ describe('RBAC / ListAgent', () => {
             getId: (entity: Author) => entity.id,
         },
         ({ eq }) => ({
-            read: [Roles.any],
+            read: [SystemRoles.any],
             post: [eq('id', 1)],
         }),
     )
@@ -55,7 +62,7 @@ describe('RBAC / ListAgent', () => {
             },
         },
         ({ eq }, { author }) => ({
-            read: [Roles.any],
+            read: [SystemRoles.any],
             edit: [eq('id', 1)],
             post: [author.post],
             delete: [],

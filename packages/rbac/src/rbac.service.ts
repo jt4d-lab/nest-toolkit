@@ -5,7 +5,7 @@ import { IAgentManagerService } from './agent/types';
 import { getMeta } from './decorators';
 import { EmptyObject } from './empty-object';
 import { Logger } from './logger';
-import { RelatedEntities, Role, Roles, ScopeType } from './matrix';
+import { RelatedEntities, Role, ScopeType, SystemRoles } from './matrix';
 import { EntityWithPermission } from './permissions';
 import { rbacBaseResolverToken, rbacFeatureMatrices } from './rbac.providers';
 import type {
@@ -205,8 +205,8 @@ export class RbacService implements IAgentManagerService {
         roles.push(...additionalRoles);
 
         const baseRoles = [
-            Roles.any,
-            loggedIn ? Roles.loggedIn : Roles.guest,
+            SystemRoles.any,
+            loggedIn ? SystemRoles.loggedIn : SystemRoles.guest,
             ...roles.flat().filter((item): item is Role => Boolean(item)),
         ];
 

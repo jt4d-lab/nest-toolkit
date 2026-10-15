@@ -1,4 +1,4 @@
-import { PermissionsResolver, RBACMatrix, Roles } from '../../..';
+import { PermissionsResolver, RBACMatrix, SystemRoles } from '../../..';
 
 import { articlesDatabase } from './data';
 import { Article } from './entities';
@@ -13,7 +13,7 @@ import { OrgRBAC } from './org.rbac';
         },
     },
     (_, { org }) => ({
-        read: [Roles.any],
+        read: [SystemRoles.any],
         readList: [org.read],
         write: [org.writeArticle],
         create: [org.writeArticle],

@@ -1,4 +1,4 @@
-import { createRole, PermissionsResolver, RBACMatrix, Roles } from '../../..';
+import { createRole, PermissionsResolver, RBACMatrix, SystemRoles } from '../../..';
 import { UpdateRolesProps } from '../../../resolver';
 
 import { orgsDatabase } from './data';
@@ -12,7 +12,7 @@ export const orgMember = createRole('orgMember');
         getId: (entity: Org) => entity.id,
     },
     () => ({
-        read: [Roles.any],
+        read: [SystemRoles.any],
         writeArticle: [orgMember],
     }),
 )

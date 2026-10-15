@@ -7,7 +7,7 @@ import {
     RBACMatrix,
     RbacModule,
     RbacService,
-    Roles,
+    SystemRoles,
 } from '..';
 import { EntityWithPermission } from '../permissions';
 import { LocalLoggerModule, TestingLogger, TestingLoggerMatcher } from '../test-utils/logger';
@@ -28,7 +28,7 @@ describe('RBAC / EntityAgent', () => {
             getId: (entity: Article) => entity.id,
         },
         ({ eq }) => ({
-            read: [Roles.any],
+            read: [SystemRoles.any],
             edit: [eq('id', 1)],
             delete: [],
         }),

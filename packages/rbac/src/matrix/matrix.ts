@@ -2,7 +2,7 @@ import { EmptyObject } from '../empty-object';
 import { EntityWithPermission, PermissionFromEntity } from '../permissions';
 
 import { buildGraph } from './build-graph';
-import { Roles } from './items';
+import { SystemRoles } from './items';
 import { Operators } from './operators';
 import {
     CalculatedRelations,
@@ -42,9 +42,9 @@ export function createPermissionMatrix<
         entity?: Entity,
         relations?: CalculatedRelations<Related>,
     ): PermissionFromEntity<Entity>[] {
-        const roleList: string[] = [Roles.any.name];
+        const roleList: string[] = [SystemRoles.any.name];
 
-        addRole(Roles.any);
+        addRole(SystemRoles.any);
         roles.forEach(addRole);
 
         return graph.calculate(

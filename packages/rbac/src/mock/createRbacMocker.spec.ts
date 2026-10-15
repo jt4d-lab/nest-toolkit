@@ -10,7 +10,7 @@ import {
     RBACEntityAgent,
     RBACMatrix,
     RbacService,
-    Roles,
+    SystemRoles,
 } from '..';
 import { RBACAgentManager } from '../agent';
 import { getMeta } from '../decorators';
@@ -38,7 +38,7 @@ const adminRole = createRole('admin');
         getId: (entity: IDemoEntity) => entity.id,
     },
     () => ({
-        read: [Roles.loggedIn],
+        read: [SystemRoles.loggedIn],
         write: [adminRole],
     }),
 )
@@ -60,7 +60,7 @@ class ComplexService {}
         },
     },
     (_, { demo }) => ({
-        read: [Roles.loggedIn],
+        read: [SystemRoles.loggedIn],
         write: [demo.write],
     }),
 )

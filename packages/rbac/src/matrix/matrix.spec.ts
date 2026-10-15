@@ -1,6 +1,6 @@
 import { EntityWithPermission } from '../permissions';
 
-import { createRole, Roles } from './items';
+import { createRole, SystemRoles } from './items';
 import { createPermissionMatrix } from './matrix';
 import { Operators } from './operators';
 import { ItemType } from './types';
@@ -33,14 +33,14 @@ describe('RBAC PermissionMatrix', () => {
             const matrix = createPermissionMatrix(
                 'post',
                 () => ({
-                    read: [Roles.guest],
+                    read: [SystemRoles.guest],
                 }),
                 {},
             );
 
             // act
-            const guestPermitted = matrix.resolvePermissions([Roles.guest], {});
-            const loggedUserPermitted = matrix.resolvePermissions([Roles.loggedIn], {});
+            const guestPermitted = matrix.resolvePermissions([SystemRoles.guest], {});
+            const loggedUserPermitted = matrix.resolvePermissions([SystemRoles.loggedIn], {});
 
             // assert
             expect(guestPermitted).toEqual(['read']);
@@ -69,7 +69,7 @@ describe('RBAC PermissionMatrix', () => {
             const matrix = createPermissionMatrix(
                 'post',
                 () => ({
-                    read: [userRole, Roles.guest],
+                    read: [userRole, SystemRoles.guest],
                 }),
                 {},
             );
@@ -174,7 +174,7 @@ describe('RBAC PermissionMatrix', () => {
             });
             it('should forbid if role is not suitable', () => {
                 const permitted = matrix.resolvePermissions(
-                    [Roles.guest],
+                    [SystemRoles.guest],
                     {
                         userId: 1 /* owner */,
                     },
@@ -227,7 +227,7 @@ describe('RBAC PermissionMatrix', () => {
         it('should throw error if rules less than 2', () => {
             const operators = new Operators<EntityWithPermission>();
 
-            expect(() => operators.and(Roles.any)).toThrow();
+            expect(() => operators.and(SystemRoles.any)).toThrow();
         });
         it('выполняются все условия', () => {
             expect(
@@ -299,7 +299,7 @@ describe('RBAC PermissionMatrix', () => {
         it('should throw error if rules less than 2', () => {
             const operators = new Operators<EntityWithPermission>();
 
-            expect(() => operators.or(Roles.any)).toThrow();
+            expect(() => operators.or(SystemRoles.any)).toThrow();
         });
         it('выполняются все условия', () => {
             expect(
@@ -442,9 +442,9 @@ describe('RBAC PermissionMatrix', () => {
                 });
 
                 return {
-                    read: [Roles.any],
+                    read: [SystemRoles.any],
                     create: [userRole],
-                    update: [and(Roles.loggedIn, ownerRule)],
+                    update: [and(SystemRoles.loggedIn, ownerRule)],
                     delete: [and(ownerRule, eq('draft', true)), adminRole],
                     rate: [and(userRole, eq('draft', false))],
                 };
@@ -453,12 +453,12 @@ describe('RBAC PermissionMatrix', () => {
         );
 
         it('guest', () => {
-            const permitted = postMatrix.resolvePermissions([Roles.guest], {});
+            const permitted = postMatrix.resolvePermissions([SystemRoles.guest], {});
 
             expect(permitted).toEqual(['read']);
         });
         it('user', () => {
-            const permitted = postMatrix.resolvePermissions([Roles.loggedIn, userRole], {
+            const permitted = postMatrix.resolvePermissions([SystemRoles.loggedIn, userRole], {
                 userId: 1,
             });
 
@@ -466,7 +466,7 @@ describe('RBAC PermissionMatrix', () => {
         });
         it('user, owner, draft', () => {
             const permitted = postMatrix.resolvePermissions(
-                [Roles.loggedIn, userRole],
+                [SystemRoles.loggedIn, userRole],
                 { userId: 1 },
                 { id: 1, contest: { id: 1 }, ownerId: 1, draft: true },
             );
@@ -475,7 +475,7 @@ describe('RBAC PermissionMatrix', () => {
         });
         it('user, owner, not draft', () => {
             const permitted = postMatrix.resolvePermissions(
-                [Roles.loggedIn, userRole],
+                [SystemRoles.loggedIn, userRole],
                 { userId: 1 },
                 { id: 1, contest: { id: 1 }, ownerId: 1, draft: false },
             );
@@ -484,7 +484,7 @@ describe('RBAC PermissionMatrix', () => {
         });
         it('user, not owner', () => {
             const permitted = postMatrix.resolvePermissions(
-                [Roles.loggedIn, userRole],
+                [SystemRoles.loggedIn, userRole],
                 { userId: 1 },
                 { id: 1, contest: { id: 1 }, ownerId: 2, draft: false },
             );
@@ -492,7 +492,7 @@ describe('RBAC PermissionMatrix', () => {
             expect(permitted.sort()).toEqual(['read', 'create', 'rate'].sort());
         });
         it('admin', () => {
-            const permitted = postMatrix.resolvePermissions([Roles.loggedIn, adminRole], {
+            const permitted = postMatrix.resolvePermissions([SystemRoles.loggedIn, adminRole], {
                 userId: 2,
             });
 
@@ -500,7 +500,7 @@ describe('RBAC PermissionMatrix', () => {
         });
         it('admin, owner', () => {
             const permitted = postMatrix.resolvePermissions(
-                [Roles.loggedIn, adminRole],
+                [SystemRoles.loggedIn, adminRole],
                 { userId: 2 },
                 { id: 1, contest: { id: 1 }, ownerId: 2, draft: false },
             );
@@ -509,7 +509,7 @@ describe('RBAC PermissionMatrix', () => {
         });
         it('admin, not owner', () => {
             const permitted = postMatrix.resolvePermissions(
-                [Roles.loggedIn, adminRole],
+                [SystemRoles.loggedIn, adminRole],
                 { userId: 2 },
                 { id: 1, contest: { id: 1 }, ownerId: 1, draft: false },
             );
@@ -518,7 +518,7 @@ describe('RBAC PermissionMatrix', () => {
         });
         it('superAdmin, no draft', () => {
             const permitted = postMatrix.resolvePermissions(
-                [Roles.loggedIn, superAdminRole],
+                [SystemRoles.loggedIn, superAdminRole],
                 { userId: 3 },
                 { id: 1, contest: { id: 1 }, ownerId: 1, draft: false },
             );

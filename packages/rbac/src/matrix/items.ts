@@ -3,7 +3,7 @@ import { EntityWithPermission } from '../permissions';
 
 import { ItemType, Role, Rule, ScopeType } from './types';
 
-export const Roles = {
+export const SystemRoles = {
     any: createRole('ΔAny'),
     guest: createRole('ΔGuest'),
     loggedIn: createRole('ΔLoggedIn'),
@@ -25,7 +25,7 @@ export function createRule<Entity extends EntityWithPermission = EmptyObject>(
     return {
         type: ItemType.Rule,
         name,
-        deps: [Roles.any],
+        deps: [SystemRoles.any],
         checkAccess,
         opts,
     };
