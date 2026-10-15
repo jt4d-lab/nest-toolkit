@@ -257,18 +257,18 @@ export class DefaultRBACLogger implements RBACLogger {
 - Create: `packages/rbac/src/test-utils/rbac-logger.ts`
 - Create: `packages/rbac/src/test-utils/rbac-logger.spec.ts`
 
-- [ ] реализовать `TestingRBACLogger implements RBACLogger`: запись записей `{ type, ...payload }`,
+- [x] реализовать `TestingRBACLogger implements RBACLogger`: запись записей `{ type, ...payload }`,
       `clear()`
-- [ ] реализовать матчер: точки входа по событию (`accessGranted()`, …, `any()`),
+- [x] реализовать матчер: точки входа по событию (`accessGranted()`, …, `any()`),
       `withDetails(partial)`, `strict()` (полное совпадение payload),
       `toBeLogged()`/`toBeNotLogged()`/`toBeLoggedOnce()`/`toBeLoggedTimes(n)` с понятным
       fail-мессаджем (что ожидалось / что записано)
-- [ ] реализовать `RBACTestingLoggerModule.forTesting()` — `global: true` модуль, providers
+- [x] реализовать `RBACTestingLoggerModule.forTesting()` — `global: true` модуль, providers
       `TestingRBACLogger` + `{ provide: RBAC_LOGGER, useExisting: TestingRBACLogger }`, exports
       `RBAC_LOGGER`, `TestingRBACLogger`
-- [ ] написать тесты рекордера и матчера: запись по каждому событию, частичный match, strict match,
+- [x] написать тесты рекордера и матчера: запись по каждому событию, частичный match, strict match,
       количество, empty-кейс («no events recorded»)
-- [ ] выполнить `nx test rbac` — зелёно
+- [x] выполнить `nx test rbac` — зелёно
 
 ### Task 3: Атомарный свитч ядра на новый контракт + миграция спеков
 
